@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gamified Expense Tracker — Single File</title>
+  <style>
+    /* ---------- Variables ---------- */
+    :root{
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --muted: #7b8191;
+      --accent: #6c5ce7;
+      --accent-2: #00b894;
+      --danger: #ff7675;
+      --glass: rgba(255,255,255,0.6);
+      --glass-dark: rgba(255,255,255,0.04);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    .dark{ --bg:#0f1724; --card:#0b1220; --muted:#9aa6bf; --glass:rgba(255,255,255,0.02); }
+
+    /* ---------- Page layout ---------- */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#dfe7ff 60%);transition:background .35s}
+    .app{max-width:1100px;margin:30px auto;padding:24px;display:grid;grid-template-columns:360px 1fr;gap:20px}
+
+    /* ---------- Sidebar (controls) ---------- */
+    .panel{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06);backdrop-filter: blur(6px)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#00c6ff);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px}
+    h2{margin:6px 0 0}
+    p.lead{color:var(--muted);margin:8px 0 14px}
+
+    /* form */
+    .field{display:flex;flex-direction:column;margin-bottom:10px}
+    label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text],input[type=number],select,input[type=date],textarea{padding:10px;border-radius:10px;border:1px solid rgba(16,24,40,0.06);background:transparent}
+    textarea{resize:vertical;min-height:66px}
+    .buttons{display:flex;gap:8px;margin-top:8px}
+    button.primary{background:linear-gradient(90deg,var(--accent),#00b894);color:white;padding:10px;border-radius:10px;border:0;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(16,24,40,0.06);padding:10px;border-radius:10px;cursor:pointer}
+
+    /* budget progress */
+    .budget{margin-top:12px}
+    .progress{height:14px;background:linear-gradient(90deg,#e6eaf7,#f6f8ff);border-radius:10px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#00c6ff);width:0%;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+    .progress-info{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px}
+
+    /* ---------- Main content ---------- */
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px}
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .stat{padding:16px;border-radius:12px;background:linear-gradient(180deg,var(--card),#f9fbff);display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+    .stat .big{font-size:20px;font-weight:700}
+    .stat .muted{color:var(--muted);font-size:13px}
+
+    /* floating decorative */
+    .float{position:absolute;right:-30px;top:-40px;width:160px;height:160px;border-radius:50%;filter:blur(30px);opacity:.12;transform:rotate(30deg)}
+
+    /* list */
+    .list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:var(--card);box-shadow:0 6px 14px rgba(16,24,40,0.04)}
+    .meta{display:flex;gap:12px;align-items:center}
+    .dot{width:12px;height:12px;border-radius:50%}
+    .actions button{border:0;background:transparent;cursor:pointer;margin-left:6px}
+
+    /* chart canvas container */
+    .card-chart{padding:14px;border-radius:12px;background:var(--card);height:320px;display:flex;flex-direction:column}
+
+    /* confetti */
+    #confetti{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none}
+
+    /* responsive */
+    @media (max-width:980px){.app{grid-template-columns:1fr;}.grid{grid-template-columns:1fr}.cards{grid-template-columns:1fr}}
+
+    /* animations */
+    @keyframes pop {0%{transform:translateY(8px);opacity:0}100%{transform:none;opacity:1}}
+    .stat, .item{animation:pop .45s cubic-bezier(.2,.9,.3,1)}
+
+    /* dark tweaks */
+    .dark body{background:#071024}
+    .toggle-theme{position:fixed;left:20px;bottom:20px;padding:10px;border-radius:12px;background:var(--card);box-shadow:0 10px 30px rgba(12,18,32,0.12);cursor:pointer}
+
+    /* neat small helpers */
+    .small{font-size:13px;color:var(--muted)}
+    .center{display:flex;align-items:center;justify-content:center}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- SIDEBAR -->
+    <aside class="panel">
+      <div class="brand">
+        <div class="logo">GT</div>
+        <div>
+          <h2>GamifyTrack</h2>
+          <p class="lead">Make spending smarter — earn rewards for staying under budget.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="field">
+          <label>Expense title</label>
+          <input id="inpTitle" type="text" placeholder="Lunch at cafe" />
+        </div>
+        <div class="field">
+          <label>Amount (USD)</label>
+          <input id="inpAmount" type="number" step="0.01" placeholder="12.50" />
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="inpCategory">
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Bills">Bills</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input id="inpDate" type="date" />
+        </div>
+        <div class="field">
+          <label>Note (optional)</label>
+          <textarea id="inpNote" placeholder="Optional details..."></textarea>
+        </div>
+        <div class="buttons">
+          <button class="primary" id="addBtn">Add Expense</button>
+          <button class="ghost" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="budget">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <div>
+              <div class="small">Monthly Budget</div>
+              <div style="font-weight:700">$<span id="budgetLabel">1000</span></div>
+            </div>
+            <div style="text-align:right">
+              <div class="small">Remaining</div>
+              <div style="font-weight:700;color:var(--accent-2)">$<span id="remainingLabel">1000</span></div>
+            </div>
+          </div>
+          <div class="progress" style="margin-top:12px">
+            <i id="progressBar"></i>
+          </div>
+          <div class="progress-info">
+            <div class="small">Spent: $<span id="spentLabel">0</span></div>
+            <div class="small">Goal: <span id="goalPct">0</span>%</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ghost" id="exportBtn">Export</button>
+          <button class="ghost" id="importBtn">Import</button>
+          <button class="ghost" id="resetBtn">Reset All</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+      <div class="grid">
+        <div>
+          <div class="cards">
+            <div class="stat">
+              <div class="muted">Total Spent</div>
+              <div class="big" id="totSpent">$0.00</div>
+              <div class="small">This month</div>
+              <div class="float" style="background:linear-gradient(135deg,#6c5ce7,#00c6ff);"></div>
+            </div>
+            <div class="stat">
+              <div class="muted">Transactions</div>
+              <div class="big" id="totCount">0</div>
+              <div class="small">Number of entries</div>
+              <div class="float" style="background:linear-gradient(135deg,#00b894,#00c6ff);"></div>
+            </div>
+            <div class="stat" style="grid-column:span 2">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div class="muted">Monthly Summary</div>
+                  <div class="big" id="monthLabel">—</div>
+                </div>
+                <div class="small">Tip: click a category in the pie to filter</div>
+              </div>
+              <div style="height:220px;margin-top:10px;display:flex;gap:12px">
+                <div style="flex:1" class="card-chart">
+                  <canvas id="pieChart"></canvas>
+                </div>
+                <div style="width:160px;display:flex;flex-direction:column;gap:8px;padding:8px">
+                  <div class="small">Top categories</div>
+                  <div id="legend"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px" class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3 style="margin:0">Expenses</h3>
+              <div>
+                <input id="filterText" placeholder="Search" style="padding:8px;border-radius:8px;border:1px solid rgba(16,24,40,0.05)" />
+              </div>
+            </div>
+            <div class="list" id="expenseList"></div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="small">Progress to goal</div>
+                <div style="font-weight:700" id="goalLabel">0/0</div>
+              </div>
+              <div id="badge" class="center" style="width:64px;height:64px;border-radius:12px;background:linear-gradient(90deg,#ffd166,#ff8a65);color:white;font-weight:800">😄</div>
+            </div>
+            <div style="margin-top:12px" id="rewardText" class="small">Stay under budget to earn rewards and streaks.</div>
+          </div>
+
+          <div style="height:18px"></div>
+
+          <div class="panel center" style="flex-direction:column;gap:8px;padding:18px">
+            <div class="small">Quick actions</div>
+            <div style="display:flex;gap:8px;width:100%">
+              <button class="ghost" id="addTest">Add Test Expense</button>
+              <button class="ghost" id="toggleTheme">Theme</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <canvas id="confetti"></canvas>
+  <div class="toggle-theme" id="themeFab">🌗</div>
+
+  <script>
+    /* ---------- Utilities ---------- */
+    const $ = (id)=>document.getElementById(id);
+    const fmt = (n)=>Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    const today = new Date();
+    const monthKey = (d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+
+    /* ---------- App State ---------- */
+    let state = JSON.parse(localStorage.getItem('gt_state') || '{}') || {};
+    state.budget = state.budget || 1000;
+    state.expenses = state.expenses || [];
+    state.theme = state.theme || 'light';
+
+    // set initial UI values
+    $('budgetLabel').textContent = state.budget;
+    $('inpDate').value = (new Date()).toISOString().slice(0,10);
+
+    /* ---------- Core Logic ---------- */
+    function save(){
+      localStorage.setItem('gt_state', JSON.stringify(state));
+    }
+
+    function addExpense(e){
+      const title = $('inpTitle').value.trim();
+      const amount = parseFloat($('inpAmount').value);
+      const cat = $('inpCategory').value;
+      const date = $('inpDate').value || new Date().toISOString().slice(0,10);
+      const note = $('inpNote').value.trim();
+      if(!title || !amount || amount<=0){alert('Please provide a valid title and amount');return}
+      const entry = {id:Date.now(),title,amount,cat,date,note};
+      state.expenses.push(entry);
+      save();
+      render();
+      clearForm();
+    }
+
+    function clearForm(){
+      $('inpTitle').value='';$('inpAmount').value='';$('inpNote').value='';
+    }
+
+    function resetAll(){if(!confirm('Reset all data?'))return;state.expenses=[];state.budget=1000;save();render();}
+
+    function exportJSON(){const blob = new Blob([JSON.stringify(state)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='gamifytrack_export.json';a.click();URL.revokeObjectURL(url);}    
+
+    function importJSON(){
+      const inp=document.createElement('input');inp.type='file';inp.accept='application/json';inp.onchange=async ()=>{
+        const f=inp.files[0];if(!f) return;const txt=await f.text();try{const obj=JSON.parse(txt);state=obj;save();render();alert('Imported');}catch(e){alert('Invalid file')}
+      };inp.click();
+    }
+
+    /* ---------- Analytics ---------- */
+    function summarize(monthKeyFilter){
+      // returns {spent,byCategory,count,topCategories}
+      const filtered = state.expenses.filter(e=>{
+        if(!monthKeyFilter) return true;
+        const d=new Date(e.date);return monthKey(d)===monthKeyFilter;
+      });
+      const spent = filtered.reduce((s,a)=>s+a.amount,0);
+      const byCat = {};
+      filtered.forEach(e=>byCat[e.cat]=(byCat[e.cat]||0)+e.amount);
+      const sortedCats = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+      return {spent,byCat,count:filtered.length,sortedCats,filtered};
+    }
+
+    /* ---------- Render UI ---------- */
+    function render(){
+      save();
+      // which month
+      const mk = monthKey(new Date());
+      const s = summarize(mk);
+      $('totSpent').textContent = '$' + fmt(s.spent);
+      $('totCount').textContent = s.count;
+      $('monthLabel').textContent = new Date().toLocaleString(undefined,{month:'long',year:'numeric'});
+      $('spentLabel').textContent = fmt(s.spent);
+
+      const remaining = Math.max(0, state.budget - s.spent);
+      $('remainingLabel').textContent = fmt(remaining);
+      const pct = Math.min(100, Math.round((s.spent/state.budget)*100));
+      $('goalPct').textContent = pct;
+      $('progressBar').style.width = pct+'%';
+      $('goalLabel').textContent = '$'+fmt(s.spent)+' / $'+fmt(state.budget);
+
+      // list
+      const list = $('expenseList'); list.innerHTML='';
+      const filter = $('filterText').value.toLowerCase();
+      s.filtered.filter(x=>x.title.toLowerCase().includes(filter) || x.cat.toLowerCase().includes(filter) || (x.note||'').toLowerCase().includes(filter))
+        .sort((a,b)=>new Date(b.date)-new Date(a.date))
+        .forEach(item=>{
+          const el = document.createElement('div');el.className='item';
+          const dot=document.createElement('div');dot.className='dot';dot.style.background=colorFor(item.cat);
+          const left=document.createElement('div');left.className='meta';left.appendChild(dot);
+          left.appendChild(document.createElement('div'));
+          left.querySelector('div:last-child').innerHTML=`<div style="font-weight:700">${escapeHtml(item.title)}</div><div class='small'>${item.cat} • ${item.date}</div>`;
+          const right=document.createElement('div');right.innerHTML=`<div style="text-align:right"><div style="font-weight:700">$${fmt(item.amount)}</div><div class='small'>${escapeHtml(item.note||'')}</div></div>`;
+          const actions=document.createElement('div');actions.className='actions';
+          const del=document.createElement('button');del.title='Delete';del.innerHTML='🗑';del.onclick=()=>{if(confirm('Delete?')){state.expenses=state.expenses.filter(e=>e.id!==item.id);render();}};
+          const edit=document.createElement('button');edit.title='Edit';edit.innerHTML='✏️';edit.onclick=()=>openEdit(item);
+          actions.appendChild(edit);actions.appendChild(del);
+          el.appendChild(left);el.appendChild(right);el.appendChild(actions);
+          list.appendChild(el);
+      });
+
+      // chart
+      drawPie(s.byCat);
+
+      // legend
+      const legend = $('legend');legend.innerHTML='';
+      s.sortedCats.slice(0,6).forEach(([cat,amt])=>{const row=document.createElement('div');row.style.display='flex';row.style.alignItems='center';row.style.gap='8px';row.innerHTML=`<div style='width:12px;height:12px;border-radius:4px;background:${colorFor(cat)}'></div><div style='flex:1'>${cat}</div><div style='font-weight:700'>$${fmt(amt)}</div>`;legend.appendChild(row)});
+
+      // reward logic
+      updateRewards(s.spent);
+    }
+
+    function openEdit(item){
+      const title=prompt('Title',item.title); if(title==null) return; const amount=prompt('Amount',item.amount); if(amount==null) return; item.title=title;item.amount=parseFloat(amount);item.cat=prompt('Category',item.cat)||item.cat;item.date=prompt('Date',item.date)||item.date;save();render();
+    }
+
+    function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+    /* ---------- colors per category ---------- */
+    const palette = ['#6c5ce7','#00b894','#00c6ff','#ff7675','#ffd166','#e84393','#fd79a8'];
+    function colorFor(cat){const i = Math.abs(hashCode(cat)) % palette.length; return palette[i];}
+    function hashCode(str){let h=0;for(let i=0;i<str.length;i++){h=(h<<5)-h+str.charCodeAt(i);h|=0;}return h}
+
+    /* ---------- Pie Chart (Canvas) ---------- */
+    const pieCanvas = $('pieChart'); const pieCtx = pieCanvas.getContext('2d');
+    function resizePie(){const ratio = window.devicePixelRatio || 1; pieCanvas.width = pieCanvas.clientWidth*ratio; pieCanvas.height = pieCanvas.clientHeight*ratio; pieCtx.setTransform(ratio,0,0,ratio,0,0);}
+    window.addEventListener('resize',resizePie); setTimeout(resizePie,50);
+
+    function drawPie(byCat){
+      resizePie(); const keys=Object.keys(byCat); const vals=keys.map(k=>byCat[k]); const tot=vals.reduce((a,b)=>a+b,0); const cx=pieCanvas.clientWidth/2; const cy=pieCanvas.clientHeight/2; const r=Math.min(cx,cy)-8; pieCtx.clearRect(0,0,pieCanvas.width,pieCanvas.height);
+      if(tot===0){pieCtx.font='14px sans-serif';pieCtx.fillStyle='var(--muted)';pieCtx.textAlign='center';pieCtx.fillText('No expenses yet',cx,cy);return}
+      let start= -Math.PI/2; keys.forEach((k,i)=>{const slice = byCat[k]/tot * Math.PI*2; pieCtx.beginPath(); pieCtx.moveTo(cx,cy); pieCtx.arc(cx,cy,r,start,start+slice); pieCtx.closePath(); pieCtx.fillStyle=colorFor(k); pieCtx.fill(); start += slice;});
+    }
+
+    // click on pie -> filter by angle
+    pieCanvas.addEventListener('click',(ev)=>{
+      const rect=pieCanvas.getBoundingClientRect(); const x=ev.clientX-rect.left; const y=ev.clientY-rect.top; const keys=Object.keys(summarize(monthKey(new Date())).byCat); const vals=keys.map(k=>summarize(monthKey(new Date())).byCat[k]); const tot=vals.reduce((a,b)=>a+b,0); if(tot===0) return; const cx=pieCanvas.clientWidth/2; const cy=pieCanvas.clientHeight/2; const r=Math.min(cx,cy)-8; const dx=x-cx, dy=y-cy; const d=Math.sqrt(dx*dx+dy*dy); if(d>r) return; let angle=Math.atan2(dy,dx); if(angle< -Math.PI/2) angle += Math.PI*2; angle += Math.PI/2; let accum=0; for(let i=0;i<keys.length;i++){const slice = vals[i]/tot * Math.PI*2; if(angle>=accum && angle<=accum+slice){$('filterText').value = keys[i]; render();return} accum+=slice;} });
+
+    /* ---------- Reward & Confetti ---------- */
+    function updateRewards(spent){
+      const pct = (spent/state.budget)*100; const badge = $('badge'); const rt=$('rewardText');
+      if(pct<50){ badge.textContent='🏆'; badge.style.background='linear-gradient(90deg,#ffd166,#ff8a65)'; rt.textContent='Excellent! You are well under budget — keep it up.'; fireConfetti(80); }
+      else if(pct<85){ badge.textContent='🎯'; badge.style.background='linear-gradient(90deg,#6c5ce7,#00c6ff)'; rt.textContent='Good — you are on track.'; }
+      else if(pct<100){ badge.textContent='⚠️'; badge.style.background='linear-gradient(90deg,#ff9f43,#ff6b6b)'; rt.textContent='Caution — approach your budget soon.'; }
+      else { badge.textContent='💥'; badge.style.background='linear-gradient(90deg,#ff6b6b,#d63031)'; rt.textContent='Over budget — review and trim expenses.'; }
+    }
+
+    // confetti (simple)
+    const confettiCanvas = $('confetti'); const confettiCtx = confettiCanvas.getContext('2d'); let confettiPieces=[]; function resizeConfetti(){confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight;}
+    window.addEventListener('resize',resizeConfetti); resizeConfetti();
+    function fireConfetti(amount=40){confettiPieces=[];const colors=['#6c5ce7','#00b894','#00c6ff','#ffd166','#ff7675'];for(let i=0;i<amount;i++){confettiPieces.push({x:Math.random()*confettiCanvas.width,y:-20,vy:2+Math.random()*6, vx:(Math.random()-0.5)*6, size:6+Math.random()*8, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vro:Math.random()*6-3});} requestAnimationFrame(confettiTick);}    
+    function confettiTick(){confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); for(let p of confettiPieces){p.x+=p.vx; p.y+=p.vy; p.vy+=0.08; p.rot+=p.vro; confettiCtx.save(); confettiCtx.fillStyle=p.color; confettiCtx.translate(p.x,p.y); confettiCtx.rotate(p.rot*Math.PI/180); confettiCtx.fillRect(-p.size/2,-p.size/2,p.size,p.size); confettiCtx.restore();} confettiPieces = confettiPieces.filter(p=>p.y<confettiCanvas.height+40); if(confettiPieces.length>0) requestAnimationFrame(confettiTick);
+    }
+
+    /* ---------- Small helpers & events ---------- */
+    $('addBtn').addEventListener('click',addExpense);
+    $('clearBtn').addEventListener('click',clearForm);
+    $('resetBtn').addEventListener('click',resetAll);
+    $('exportBtn').addEventListener('click',exportJSON);
+    $('importBtn').addEventListener('click',importJSON);
+    $('addTest').addEventListener('click',()=>{state.expenses.push({id:Date.now()+Math.random(),title:'Coffee',amount:3.5,cat:'Food',date:new Date().toISOString().slice(0,10),note:'test'});render();});
+    $('toggleTheme').addEventListener('click',()=>{state.theme = (state.theme==='light')?'dark':'light'; applyTheme(); save();});
+    $('filterText').addEventListener('input',render);
+
+    // theme
+    function applyTheme(){ if(state.theme==='dark'){document.documentElement.classList.add('dark');document.body.classList.add('dark');} else {document.documentElement.classList.remove('dark');document.body.classList.remove('dark');}} applyTheme();
+
+    // initial render
+    render();
+
+    // small utility
+    function hashSeed(n){return Math.abs(n*9301+49297)%233280}
+  </script>
+</body>
+</html>
