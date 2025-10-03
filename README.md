@@ -7,6 +7,9 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/hari7261/Hacktoberfest-2025)](https://github.com/hari7261/Hacktoberfest-2025/pulls)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+<img width="1880" height="873" alt="image" src="https://github.com/user-attachments/assets/cd534c8f-9cdd-4b22-80ba-1fc0155e4122" />
+
+
 Welcome to our Hacktoberfest 2025 project! 🚀 This repository is designed to help developers of all skill levels contribute to open source and earn their Hacktoberfest swag while learning modern web development practices.
 
 ## 🌟 About This Project
@@ -177,5 +180,6 @@ If you found this project helpful, please consider:
 Made with ❤️ for Hacktoberfest 2025
 
 [⬆️ Back to Top](#-hacktoberfest-2025---modern-web-development-project)
+
 
 </div>
