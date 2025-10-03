@@ -76,10 +76,7 @@
     @keyframes pop {0%{transform:translateY(8px);opacity:0}100%{transform:none;opacity:1}}
     .stat, .item{animation:pop .45s cubic-bezier(.2,.9,.3,1)}
 
-    /* dark tweaks */
-    .dark body{background:#071024}
-    .toggle-theme{position:fixed;left:20px;bottom:20px;padding:10px;border-radius:12px;background:var(--card);box-shadow:0 10px 30px rgba(12,18,32,0.12);cursor:pointer}
-
+ 
     /* neat small helpers */
     .small{font-size:13px;color:var(--muted)}
     .center{display:flex;align-items:center;justify-content:center}
