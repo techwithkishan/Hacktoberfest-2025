@@ -1,176 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Notes & To-Do Dashboard</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: 0.3s;
-    }
-    :root {
-      --bg: #f4f4f9;
-      --text: #222;
-      --card: #fff;
-      --accent: #007bff;
-    }
-    .dark {
-      --bg: #1c1c1c;
-      --text: #f4f4f9;
-      --card: #2c2c2c;
-      --accent: #0d6efd;
-    }
-    header {
-      padding: 1rem;
-      text-align: center;
-      background: var(--card);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    h1 span {
-      border-right: 2px solid var(--accent);
-      animation: blink 0.7s infinite;
-    }
-    @keyframes blink {
-      50% { border-color: transparent; }
-    }
-    .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-    .controls {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    input, button {
-      padding: 0.7rem;
-      border-radius: 8px;
-      border: 1px solid var(--accent);
-      outline: none;
-    }
-    button {
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover { opacity: 0.8; }
-    .list {
-      display: grid;
-      gap: 0.5rem;
-    }
-    .card {
-      background: var(--card);
-      padding: 0.8rem;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .dark-toggle {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Notes & To-Do Dashboard</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+  :root {
+    --bg: #f4f4f9;
+    --text: #222;
+    --card: #fff;
+    --accent: #007bff;
+    --high: #ff6b6b;
+    --medium: #ffa502;
+    --low: #2ed573;
+  }
+  .dark {
+    --bg: #1c1c1c;
+    --text: #f4f4f9;
+    --card: #2c2c2c;
+    --accent: #0d6efd;
+  }
+  header {
+    padding: 1rem;
+    text-align: center;
+    background: var(--card);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  h1 span {
+    border-right: 2px solid var(--accent);
+    animation: blink 0.7s infinite;
+  }
+  @keyframes blink { 50% { border-color: transparent; } }
+
+  .container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  .controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  input, button, select {
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    outline: none;
+  }
+  select { min-width: 120px; }
+  button {
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover { opacity: 0.8; }
+
+  .list { display: grid; gap: 0.5rem; }
+  .card {
+    background: var(--card);
+    padding: 0.8rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    animation: fadeIn 0.3s ease;
+    transition: all 0.3s ease;
+  }
+  .card.completed { opacity: 0.6; transform: scale(0.98); text-decoration: line-through; }
+
+  .dark-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
+
+  .priority-high { border-left: 5px solid var(--high); padding-left: 0.5rem; }
+  .priority-medium { border-left: 5px solid var(--medium); padding-left: 0.5rem; }
+  .priority-low { border-left: 5px solid var(--low); padding-left: 0.5rem; }
+
+  .task-meta { font-size: 0.8rem; color: var(--accent); margin-left: 0.5rem; }
+</style>
 </head>
 <body>
-  <div class="dark-toggle">🌙</div>
-  <header>
-    <h1><span id="typing"></span></h1>
-  </header>
+<div class="dark-toggle">🌙</div>
+<header>
+  <h1><span id="typing"></span></h1>
+</header>
 
-  <div class="container">
-    <div class="controls">
-      <input type="text" id="taskInput" placeholder="Write a task...">
-      <button onclick="addTask()">➕ Add</button>
-      <button onclick="startSpeech()">🎤 Speak</button>
-    </div>
-    <input type="text" id="searchInput" placeholder="Search..." onkeyup="renderTasks()">
-    <div class="list" id="taskList"></div>
+<div class="container">
+  <div class="controls">
+    <input type="text" id="taskInput" placeholder="Write a task...">
+    <select id="priorityInput">
+      <option value="High">High Priority</option>
+      <option value="Medium">Medium Priority</option>
+      <option value="Low">Low Priority</option>
+    </select>
+    <input type="date" id="dueInput">
+    <button onclick="addTask()">➕ Add</button>
+    <button onclick="startSpeech()">🎤 Speak</button>
+    <button onclick="clearCompleted()">🧹 Clear Done</button>
   </div>
+  <input type="text" id="searchInput" placeholder="Search..." onkeyup="renderTasks()">
+  <div class="list" id="taskList"></div>
+</div>
 
-  <script>
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const typingText = "AI Notes & To-Do Dashboard";
-    let i = 0;
-    function typeWriter(){
-      if(i < typingText.length){
-        document.getElementById("typing").textContent += typingText.charAt(i);
-        i++;
-        setTimeout(typeWriter, 100);
-      }
-    }
-    typeWriter();
+<script>
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+const typingText = "AI Notes & To-Do Dashboard";
+let i = 0;
+function typeWriter(){
+  if(i < typingText.length){
+    document.getElementById("typing").textContent += typingText.charAt(i);
+    i++;
+    setTimeout(typeWriter, 100);
+  }
+}
+typeWriter();
 
-    function saveTasks(){
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
+function saveTasks(){ localStorage.setItem('tasks', JSON.stringify(tasks)); }
 
-    function addTask(){
-      const input = document.getElementById("taskInput");
-      if(input.value.trim() !== ""){
-        tasks.push({text: input.value, done: false});
-        input.value = "";
-        saveTasks();
-        renderTasks();
-      }
-    }
-
-    function toggleDone(index){
-      tasks[index].done = !tasks[index].done;
-      saveTasks();
-      renderTasks();
-    }
-
-    function deleteTask(index){
-      tasks.splice(index,1);
-      saveTasks();
-      renderTasks();
-    }
-
-    function renderTasks(){
-      const list = document.getElementById("taskList");
-      const search = document.getElementById("searchInput").value.toLowerCase();
-      list.innerHTML = "";
-      tasks.filter(t => t.text.toLowerCase().includes(search))
-           .forEach((t, i) => {
-        list.innerHTML += `
-          <div class="card">
-            <span style="text-decoration:${t.done?'line-through':'none'}">${t.text}</span>
-            <div>
-              <button onclick="toggleDone(${i})">✔</button>
-              <button onclick="deleteTask(${i})">🗑</button>
-            </div>
-          </div>`;
-      });
-    }
-
-    function startSpeech(){
-      if('webkitSpeechRecognition' in window){
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.onresult = function(event){
-          document.getElementById("taskInput").value = event.results[0][0].transcript;
-        }
-        recognition.start();
-      } else {
-        alert("Speech recognition not supported");
-      }
-    }
-
-    document.querySelector('.dark-toggle').onclick = () => {
-      document.body.classList.toggle('dark');
-    };
-
+function addTask(){
+  const input = document.getElementById("taskInput");
+  const priority = document.getElementById("priorityInput").value;
+  const due = document.getElementById("dueInput").value;
+  if(input.value.trim() !== ""){
+    tasks.push({text: input.value, done: false, priority, due});
+    input.value = "";
+    document.getElementById("dueInput").value = "";
+    saveTasks();
     renderTasks();
-  </script>
+  }
+}
+
+function toggleDone(index){
+  tasks[index].done = !tasks[index].done;
+  saveTasks();
+  renderTasks();
+}
+
+function deleteTask(index){
+  tasks.splice(index,1);
+  saveTasks();
+  renderTasks();
+}
+
+function clearCompleted(){
+  tasks = tasks.filter(t => !t.done);
+  saveTasks();
+  renderTasks();
+}
+
+function renderTasks(){
+  const list = document.getElementById("taskList");
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  list.innerHTML = "";
+  // sort by priority and due date
+  const priorityOrder = {"High":1,"Medium":2,"Low":3};
+  tasks.filter(t => t.text.toLowerCase().includes(search))
+       .sort((a,b)=>{
+         if(priorityOrder[a.priority] !== priorityOrder[b.priority]) return priorityOrder[a.priority]-priorityOrder[b.priority];
+         if(a.due && b.due) return new Date(a.due)-new Date(b.due);
+         return 0;
+       })
+       .forEach((t, i) => {
+    const priorityClass = t.priority === 'High' ? 'priority-high' : t.priority==='Medium' ? 'priority-medium':'priority-low';
+    list.innerHTML += `
+      <div class="card ${t.done?'completed':''} ${priorityClass}">
+        <div>
+          <span>${t.text}</span>
+          ${t.due?`<span class="task-meta">Due: ${t.due}</span>`:''}
+        </div>
+        <div>
+          <button onclick="toggleDone(${i})">✔</button>
+          <button onclick="deleteTask(${i})">🗑</button>
+        </div>
+      </div>`;
+  });
+}
+
+function startSpeech(){
+  if('webkitSpeechRecognition' in window){
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.onresult = function(event){
+      document.getElementById("taskInput").value = event.results[0][0].transcript;
+    }
+    recognition.start();
+  } else {
+    alert("Speech recognition not supported");
+  }
+}
+
+document.querySelector('.dark-toggle').onclick = () => {
+  document.body.classList.toggle('dark');
+};
+
+renderTasks();
+</script>
 </body>
 </html>
+
