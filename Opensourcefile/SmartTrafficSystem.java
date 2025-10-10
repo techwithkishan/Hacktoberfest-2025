@@ -1,7 +1,7 @@
 import java.util.*;
 import java.util.concurrent.*;
 
-// OOP: TrafficSignal class represents each signal in the city
+
 class TrafficSignal {
     private String location;
     private boolean greenLight;
