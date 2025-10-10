@@ -1,7 +1,5 @@
 import java.util.*;
 import java.util.concurrent.*;
-
-// OOP: Sensor class
 class Sensor {
     private String type;
     private double value;
@@ -69,7 +67,6 @@ public class WeatherMonitoringSystem {
             t.start();
         }
 
-        // Wait for all threads to finish
         for (Thread t : threads) {
             try {
                 t.join();
@@ -78,7 +75,6 @@ public class WeatherMonitoringSystem {
             }
         }
 
-        // Display final sensor readings
         System.out.println("\n=== Final Sensor Readings ===");
         for (Sensor s : sensors) {
             System.out.println(s.getType() + ": " + String.format("%.2f", s.getValue()));
