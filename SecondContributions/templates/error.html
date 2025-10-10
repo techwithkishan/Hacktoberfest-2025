@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Fintech Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Application Error
+                    </h4>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-bug fa-4x text-danger mb-3"></i>
+                    <h5 class="text-danger mb-3">Something went wrong</h5>
+                    
+                    {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Error Details:</strong><br>
+                            {{ error }}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">An unexpected error occurred while processing your request.</p>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-1"></i>
+                            Return to Dashboard
+                        </a>
+                        <button class="btn btn-outline-secondary" onclick="history.back()">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Go Back
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-top">
+                        <h6 class="text-muted">Need Help?</h6>
+                        <p class="text-muted small">
+                            If this error persists, please check:
+                        </p>
+                        <ul class="list-unstyled text-muted small">
+                            <li><i class="fas fa-check me-1"></i> Database connection is working</li>
+                            <li><i class="fas fa-check me-1"></i> Environment variables are set correctly</li>
+                            <li><i class="fas fa-check me-1"></i> API keys are valid and active</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
