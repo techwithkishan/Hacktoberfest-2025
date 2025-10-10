@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Metrics - Fintech Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-chart-bar me-2"></i>
+        Financial Metrics
+    </h2>
+    <button class="btn btn-primary" onclick="runETL()">
+        <i class="fas fa-sync me-1"></i>
+        Refresh Data
+    </button>
+</div>
+
+{% if metrics.items %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Daily Market Data</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Open</th>
+                            <th>High</th>
+                            <th>Low</th>
+                            <th>Close</th>
+                            <th>Change</th>
+                            <th>Volume</th>
+                            <th>Market Cap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric in metrics.items %}
+                        <tr>
+                            <td>
+                                <strong>{{ metric.date.strftime('%Y-%m-%d') }}</strong>
+                                <br>
+                                <small class="text-muted">{{ metric.date.strftime('%A') }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary fs-6">{{ metric.symbol }}</span>
+                            </td>
+                            <td>${{ "%.2f"|format(metric.open_price) if metric.open_price else 'N/A' }}</td>
+                            <td class="text-success">${{ "%.2f"|format(metric.high_price) if metric.high_price else 'N/A' }}</td>
+                            <td class="text-danger">${{ "%.2f"|format(metric.low_price) if metric.low_price else 'N/A' }}</td>
+                            <td>
+                                <strong>${{ "%.2f"|format(metric.close_price) if metric.close_price else 'N/A' }}</strong>
+                            </td>
+                            <td>
+                                {% if metric.open_price and metric.close_price %}
+                                    {% set change = metric.close_price - metric.open_price %}
+                                    {% set change_pct = (change / metric.open_price * 100) %}
+                                    <span class="{{ 'text-success' if change > 0 else 'text-danger' if change < 0 else 'text-muted' }}">
+                                        {{ "%.2f"|format(change) }}
+                                        <br>
+                                        <small>({{ "+%.2f"|format(change_pct) if change > 0 else "%.2f"|format(change_pct) }}%)</small>
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if metric.volume %}
+                                    {{ "{:,}".format(metric.volume) }}
+                                    <br>
+                                    <small class="text-muted">shares</small>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if metric.market_cap %}
+                                    ${{ "{:,}".format(metric.market_cap) }}
+                                    <br>
+                                    <small class="text-muted">
+                                        {% if metric.market_cap >= 1000000000000 %}
+                                            ${{ "%.1f"|format(metric.market_cap / 1000000000000) }}T
+                                        {% elif metric.market_cap >= 1000000000 %}
+                                            ${{ "%.1f"|format(metric.market_cap / 1000000000) }}B
+                                        {% elif metric.market_cap >= 1000000 %}
+                                            ${{ "%.1f"|format(metric.market_cap / 1000000) }}M
+                                        {% endif %}
+                                    </small>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if metrics.pages > 1 %}
+    <nav aria-label="Metrics pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if metrics.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('metrics_page', page=metrics.prev_num) }}">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for page_num in metrics.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != metrics.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('metrics_page', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if metrics.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('metrics_page', page=metrics.next_num) }}">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <div class="text-center text-muted mt-3">
+        Showing {{ metrics.per_page * (metrics.page - 1) + 1 }} to 
+        {{ metrics.per_page * metrics.page if metrics.page < metrics.pages else metrics.total }} 
+        of {{ metrics.total }} records
+    </div>
+    {% endif %}
+
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No metrics data available</h4>
+            <p class="text-muted mb-4">Start collecting financial data by running the ETL pipeline.</p>
+            <button class="btn btn-primary btn-lg" onclick="runETL()">
+                <i class="fas fa-play me-2"></i>
+                Run ETL Pipeline
+            </button>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Run ETL job
+async function runETL() {
+    if (!confirm('Run ETL pipeline to fetch latest financial data?')) {
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Running...';
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch('/api/run-etl', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },            body: JSON.stringify({
+                symbol: 'AAPL',
+                use_mock: false  // Use real data
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('ETL job completed successfully! Refreshing page...');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            alert('ETL job failed: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error running ETL job: ' + error.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+</script>
+{% endblock %}
