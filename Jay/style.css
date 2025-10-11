@@ -1,0 +1,337 @@
+/* Global Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 70%, #228B22 100%); /* Sky to grass gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+#game-container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px); /* Glassmorphism for realism */
+}
+
+h1 {
+    color: #4A90E2;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+#instructions {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+/* UI Elements */
+#ui {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+#timer, #score {
+    font-weight: bold;
+    color: #FFF;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+button {
+    background: linear-gradient(to right, #4A90E2, #50C878);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Game Scene */
+#scene {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    margin: 0 auto 20px;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(139, 69, 19, 0.3) 0%, transparent 50%), /* Dirt paths */
+        linear-gradient(to bottom, #90EE90 0%, #32CD32 100%); /* Lush grass */
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1); /* Depth */
+    cursor: pointer;
+}
+
+.spot {
+    position: absolute;
+    transition: transform 0.3s ease; /* Hover sway for realism */
+}
+
+.spot:hover {
+    transform: scale(1.05) rotate(1deg); /* Subtle animation */
+}
+
+/* Tree (left side) */
+#tree {
+    top: 50px;
+    left: 50px;
+    width: 80px;
+    height: 200px;
+    z-index: 2;
+}
+
+.tree-trunk {
+    width: 20px;
+    height: 120px;
+    background: linear-gradient(to bottom, #8B4513, #A0522D);
+    border-radius: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 30px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.tree-leaves {
+    width: 80px;
+    height: 100px;
+    background: radial-gradient(ellipse, #228B22 0%, #32CD32 50%, #006400 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Organic leaf shape */
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: inset -10px -10px 20px rgba(0, 100, 0, 0.3); /* Leaf texture */
+}
+
+/* Bush (center-right) */
+#bush {
+    top: 150px;
+    left: 200px;
+    width: 100px;
+    height: 80px;
+    z-index: 1;
+}
+
+.bush-leaves {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse, #006400 0%, #228B22 70%, #32CD32 100%);
+    border-radius: 50px 30px 50px 30px; /* Wavy, natural bush shape */
+    position: absolute;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(0, 100, 0, 0.5); /* Rustling edge */
+}
+
+/* Bench (bottom-left) */
+#bench {
+    bottom: 20px;
+    left: 150px;
+    width: 120px;
+    height: 60px;
+    z-index: 3;
+}
+
+.bench-seat {
+    width: 120px;
+    height: 20px;
+    background: linear-gradient(to right, #D2691E, #CD853F); /* Wood grain */
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.bench-back {
+    width: 10px;
+    height: 40px;
+    background: linear-gradient(to right, #D2691E, #CD853F);
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.bench-legs {
+    width: 120px;
+    height: 40px;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.bench-legs::before,
+.bench-legs::after {
+    content: '';
+    width: 10px;
+    height: 40px;
+    background: linear-gradient(to right, #8B4513, #A0522D);
+    border-radius: 3px;
+}
+
+/* Swing (bottom-right) */
+#swing {
+    bottom: 20px;
+    right: 50px;
+    width: 80px;
+    height: 150px;
+    z-index: 3;
+}
+
+.swing-frame {
+    width: 80px;
+    height: 100px;
+    border: 8px solid #696969; /* Metal frame */
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    position: absolute;
+    top: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.swing-seat {
+    width: 40px;
+    height: 15px;
+    background: linear-gradient(to right, #F4A460, #DAA520); /* Wooden seat */
+    border-radius: 5px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.swing-chain {
+    position: absolute;
+    top: 10px;
+    left: 35px;
+    width: 2px;
+    height: 100px;
+    background: linear-gradient(to bottom, #C0C0C0, #808080); /* Chain links */
+    box-shadow: 2px 0 0 #A9A9A9;
+}
+
+/* Shed (far right) */
+#shed {
+    top: 80px;
+    right: 20px;
+    width: 100px;
+    height: 120px;
+    z-index: 2;
+}
+
+.shed-walls {
+    width: 100%;
+    height: 100px;
+    background: repeating-linear-gradient(90deg, #DEB887 0px, #DEB887 20px, #D2B48C 20px, #D2B48C 40px); /* Wood planks */
+    position: absolute;
+    bottom: 20px;
+    border: 3px solid #8B4513;
+    border-radius: 5px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.shed-roof {
+    width: 110px;
+    height: 30px;
+    background: linear-gradient(to right, #8B0000, #A52A2A); /* Red roof */
+    position: absolute;
+    top: 0;
+    left: -5px;
+    clip-path: polygon(0 100%, 50% 0, 100% 100%); /* Triangular roof */
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.shed-door {
+    width: 40px;
+    height: 50px;
+    background: #D2691E;
+    position: absolute;
+    bottom: 20px;
+    left: 30px;
+    border-radius: 3px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Hidden Friend */
+#friend {
+    position: absolute;
+    width: 50px;
+    height: 60px;
+    z-index: 10;
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: scale(0);
+}
+
+#friend.found {
+    opacity: 1;
+    transform: scale(1) translateY(-10px); /* Bounce out */
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.friend-body {
+    width: 30px;
+    height: 40px;
+    background: linear-gradient(to bottom, #87CEEB, #4169E1); /* Blue shirt */
+    border-radius: 15px 15px 5px 5px;
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.friend-head {
+    width: 25px;
+    height: 25px;
+    background: radial-gradient(circle, #FFDAB9 0%, #FFDBAC 100%); /* Skin tone */
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 12.5px;
+    box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.friend-smile {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+}
+
+/* Messages */
+#message {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    min-height: 20px;
+    color: #4A90E2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+    display: none !important; /* For initial hiding */
+}
