@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}AI Recommendations - Fintech Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-lightbulb me-2"></i>
+        AI-Generated Insights
+    </h2>
+    <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-filter me-1"></i>
+                {{ selected_symbol or 'All Stocks' }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('recommendations_page') }}">All Stocks</a></li>
+                {% for stock in available_stocks %}
+                <li><a class="dropdown-item" href="{{ url_for('recommendations_page', symbol=stock) }}">{{ stock }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <button class="btn btn-primary" onclick="runMultiETL()">
+            <i class="fas fa-brain me-1"></i>
+            Generate New Insights
+        </button>
+    </div>
+</div>
+
+{% if recommendations.items %}
+    {% for recommendation in recommendations.items %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">            <div>
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-day me-2"></i>
+                    {{ recommendation.date.strftime('%B %d, %Y') }}
+                    <span class="ms-2 badge bg-secondary">{{ recommendation.date.strftime('%A') }}</span>
+                    <span class="ms-2 badge bg-primary">{{ recommendation.symbol }}</span>
+                </h5>
+            </div>
+            <div>
+                <span class="status-badge status-{{ 'success' if recommendation.confidence_level == 'high' else 'warning' if recommendation.confidence_level == 'medium' else 'failed' }}">
+                    <i class="fas fa-{{ 'check' if recommendation.confidence_level == 'high' else 'exclamation-triangle' if recommendation.confidence_level == 'medium' else 'times' }} me-1"></i>
+                    {{ recommendation.confidence_level.title() }} Confidence
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- Summary Section -->
+            <div class="mb-4">
+                <h6 class="text-primary mb-2">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Market Summary
+                </h6>
+                <p class="lead text-dark">{{ recommendation.summary }}</p>
+            </div>
+            
+            <!-- Sentiment Analysis -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3"><strong>Market Sentiment:</strong></span>
+                        <div class="sentiment-indicator">
+                            <i class="{{ 'fas fa-arrow-up sentiment-positive' if recommendation.sentiment_score > 0.2 else 'fas fa-arrow-down sentiment-negative' if recommendation.sentiment_score < -0.2 else 'fas fa-minus sentiment-neutral' }} fa-lg me-2"></i>
+                            <span class="fs-5 fw-bold {{ 'sentiment-positive' if recommendation.sentiment_score > 0.2 else 'sentiment-negative' if recommendation.sentiment_score < -0.2 else 'sentiment-neutral' }}">
+                                {{ "%.2f"|format(recommendation.sentiment_score) }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="progress mt-2" style="height: 6px;">
+                        {% set sentiment_percentage = ((recommendation.sentiment_score + 1) / 2 * 100) %}
+                        <div class="progress-bar bg-{{ 'success' if recommendation.sentiment_score > 0 else 'danger' if recommendation.sentiment_score < 0 else 'warning' }}" 
+                             role="progressbar" 
+                             style="width: {{ sentiment_percentage }}%"
+                             aria-valuenow="{{ sentiment_percentage }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        Range: -1.0 (Very Bearish) to +1.0 (Very Bullish)
+                    </small>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="text-end">
+                        <small class="text-muted">
+                            Generated: {{ recommendation.created_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="row">
+                {% if recommendation.recommendation_1 %}
+                <div class="col-md-4 mb-3">
+                    <div class="recommendation-card h-100">
+                        <div class="d-flex align-items-start mb-2">
+                            <i class="fas fa-1 fa-fw text-primary me-2 mt-1"></i>
+                            <h6 class="text-primary mb-2">Strategic Recommendation</h6>
+                        </div>
+                        <p class="mb-0">{{ recommendation.recommendation_1 }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if recommendation.recommendation_2 %}
+                <div class="col-md-4 mb-3">
+                    <div class="recommendation-card h-100">
+                        <div class="d-flex align-items-start mb-2">
+                            <i class="fas fa-2 fa-fw text-success me-2 mt-1"></i>
+                            <h6 class="text-success mb-2">Portfolio Management</h6>
+                        </div>
+                        <p class="mb-0">{{ recommendation.recommendation_2 }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if recommendation.recommendation_3 %}
+                <div class="col-md-4 mb-3">
+                    <div class="recommendation-card h-100">
+                        <div class="d-flex align-items-start mb-2">
+                            <i class="fas fa-3 fa-fw text-warning me-2 mt-1"></i>
+                            <h6 class="text-warning mb-2">Risk Management</h6>
+                        </div>
+                        <p class="mb-0">{{ recommendation.recommendation_3 }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Actions -->
+            <div class="mt-4 pt-3 border-top">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="shareInsight('{{ recommendation.date }}')">
+                                <i class="fas fa-share me-1"></i>Share
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="exportInsight('{{ recommendation.date }}')">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="viewRawData('{{ recommendation.id }}')">
+                                <i class="fas fa-code me-1"></i>Raw Data
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        {% if recommendation.metrics %}
+                        <small class="text-muted">
+                            <i class="fas fa-link me-1"></i>
+                            Linked to {{ recommendation.metrics.symbol }} data
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if recommendations.pages > 1 %}
+    <nav aria-label="Recommendations pagination" class="mt-4">
+        <ul class="pagination justify-content-center">            {% if recommendations.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('recommendations_page', page=recommendations.prev_num, symbol=selected_symbol) }}">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for page_num in recommendations.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != recommendations.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('recommendations_page', page=page_num, symbol=selected_symbol) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if recommendations.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('recommendations_page', page=recommendations.next_num, symbol=selected_symbol) }}">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+    <div class="text-center text-muted mt-3">
+        Showing {{ recommendations.per_page * (recommendations.page - 1) + 1 }} to 
+        {{ recommendations.per_page * recommendations.page if recommendations.page < recommendations.pages else recommendations.total }} 
+        of {{ recommendations.total }} insights
+    </div>
+    {% endif %}
+
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-lightbulb fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No AI insights available</h4>
+            <p class="text-muted mb-4">Generate your first AI-powered financial insights by running the ETL pipeline.</p>
+            <button class="btn btn-primary btn-lg" onclick="runETL()">
+                <i class="fas fa-brain me-2"></i>
+                Generate AI Insights
+            </button>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Raw Data Modal -->
+<div class="modal fade" id="rawDataModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-code me-2"></i>
+                    Raw AI Response
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="rawDataContent" class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="copyRawData()">
+                    <i class="fas fa-copy me-1"></i>Copy
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Run Multi-Stock ETL job
+async function runMultiETL() {
+    if (!confirm('Generate new AI insights for all stocks? This will analyze the latest market data for your entire portfolio.')) {
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch('/api/run-multi-etl', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                use_mock: false  // Use real data
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`AI insights generated successfully for ${result.symbols.length} stocks! Refreshing page...`);
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            alert('Failed to generate insights: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error generating insights: ' + error.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// Run ETL job for single stock (backwards compatibility)
+async function runETL() {
+    return runMultiETL();
+}
+
+// Share insight
+function shareInsight(date) {
+    const url = window.location.href;
+    const text = `Check out this AI-generated financial insight for ${date}: ${url}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'AI Financial Insight',
+            text: text,
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Insight link copied to clipboard!');
+        });
+    }
+}
+
+// Export insight
+function exportInsight(date) {
+    alert('Export functionality would be implemented here for ' + date);
+}
+
+// View raw data
+function viewRawData(recommendationId) {
+    // In a real implementation, you would fetch the raw data via API
+    const modal = new bootstrap.Modal(document.getElementById('rawDataModal'));
+    document.getElementById('rawDataContent').textContent = 'Raw AI response data would be displayed here for recommendation ID: ' + recommendationId;
+    modal.show();
+}
+
+// Copy raw data
+function copyRawData() {
+    const content = document.getElementById('rawDataContent').textContent;
+    navigator.clipboard.writeText(content).then(() => {
+        alert('Raw data copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}
