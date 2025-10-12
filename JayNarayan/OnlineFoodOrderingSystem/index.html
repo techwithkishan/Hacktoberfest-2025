@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Food Ordering System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Roboto', sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+    min-height:100vh;
+    padding:20px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .container{
+    max-width:1100px;
+    width:100%;
+    display:grid;
+    grid-template-columns: 2fr 1fr;
+    gap:20px;
+  }
+
+  h1,h2{text-align:center;}
+  h1{color:#06b6d4; margin-bottom:15px;}
+  h2{color:#7c3aed; margin-bottom:15px;}
+
+  .menu, .cart{
+    background: rgba(255,255,255,0.05);
+    padding:20px;
+    border-radius:20px;
+    backdrop-filter: blur(10px);
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+  }
+
+  .menu-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+    gap:15px;
+  }
+
+  .menu-item{
+    background: rgba(255,255,255,0.05);
+    border-radius:15px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:10px;
+    transition: transform 0.3s, background 0.3s;
+  }
+
+  .menu-item:hover{
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.1);
+  }
+
+  .menu-item img{
+    width:100%;
+    height:100px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:10px;
+  }
+
+  .menu-item h3{margin-bottom:5px;}
+  .menu-item p{margin-bottom:8px; font-size:0.9rem; color:#ddd;}
+  .menu-item input{
+    width:60px; padding:4px; margin-bottom:8px; border-radius:6px; border:none; outline:none; text-align:center;
+  }
+
+  .menu-item button{
+    padding:8px 12px;
+    border:none;
+    border-radius:10px;
+    background: linear-gradient(90deg,#7c3aed,#06b6d4);
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+    width:90%;
+  }
+
+  .menu-item button:hover{opacity:0.85;}
+
+  .cart-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px;
+    margin-bottom:10px;
+    background: rgba(255,255,255,0.03);
+    border-radius:8px;
+    transition: background 0.2s;
+  }
+
+  .cart-item button{
+    background:#ef4444;
+    border:none;
+    padding:4px 8px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.2s;
+  }
+
+  .cart-item button:hover{opacity:0.8;}
+
+  .total{
+    margin-top:12px;
+    font-weight:bold;
+    font-size:1.1rem;
+    text-align:right;
+  }
+
+  @media(max-width:900px){
+    .container{grid-template-columns:1fr;}
+    .menu-grid{grid-template-columns: repeat(auto-fit,minmax(140px,1fr));}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Menu -->
+  <div class="menu">
+    <h1>Food Menu</h1>
+    <div class="menu-grid" id="menuList"></div>
+  </div>
+
+  <!-- Cart -->
+  <div class="cart">
+    <h2>Cart</h2>
+    <div id="cartList"></div>
+    <div class="total" id="totalPrice">Total: $0</div>
+  </div>
+</div>
+
+<script>
+const menu = [
+  {id:1,name:'Pizza',price:8,img:'https://source.unsplash.com/150x100/?pizza'},
+  {id:2,name:'Burger',price:5,img:'https://source.unsplash.com/150x100/?burger'},
+  {id:3,name:'Pasta',price:7,img:'https://source.unsplash.com/150x100/?pasta'},
+  {id:4,name:'Salad',price:4,img:'https://source.unsplash.com/150x100/?salad'},
+  {id:5,name:'Sushi',price:10,img:'https://source.unsplash.com/150x100/?sushi'},
+  {id:6,name:'Fries',price:3,img:'https://source.unsplash.com/150x100/?fries'}
+];
+
+let cart = JSON.parse(localStorage.getItem('foodCart') || '[]');
+
+const menuList = document.getElementById('menuList');
+const cartList = document.getElementById('cartList');
+const totalPrice = document.getElementById('totalPrice');
+
+function renderMenu(){
+  menuList.innerHTML='';
+  menu.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='menu-item';
+    div.innerHTML=`
+      <img src="${item.img}" alt="${item.name}">
+      <h3>${item.name}</h3>
+      <p>Price: $${item.price}</p>
+      <input type="number" min="1" value="1" id="qty-${item.id}">
+      <button onclick="addToCart(${item.id})">Add</button>
+    `;
+    menuList.appendChild(div);
+  });
+}
+
+function renderCart(){
+  cartList.innerHTML='';
+  let total=0;
+  cart.forEach(item=>{
+    total+=item.price*item.qty;
+    const div=document.createElement('div');
+    div.className='cart-item';
+    div.innerHTML=`
+      <span>${item.name} x ${item.qty} ($${item.price*item.qty})</span>
+      <button onclick="removeFromCart(${item.id})">Remove</button>
+    `;
+    cartList.appendChild(div);
+  });
+  totalPrice.textContent=`Total: $${total}`;
+  localStorage.setItem('foodCart',JSON.stringify(cart));
+}
+
+function addToCart(id){
+  const item = menu.find(m=>m.id===id);
+  const qty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
+  const existing = cart.find(c=>c.id===id);
+  if(existing) existing.qty+=qty;
+  else cart.push({...item, qty});
+  renderCart();
+}
+
+function removeFromCart(id){
+  cart=cart.filter(c=>c.id!==id);
+  renderCart();
+}
+
+// Initialize
+renderMenu();
+renderCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Health Prediction System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Roboto', sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:20px;
+  }
+
+  .container{
+    max-width:800px;
+    width:100%;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    padding:25px 20px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+  }
+
+  h1{text-align:center; color:#06b6d4; margin-bottom:20px;}
+  h2{color:#7c3aed; margin-bottom:15px;}
+
+  .form-group{margin-bottom:15px;}
+  label{display:block; margin-bottom:6px; font-weight:600;}
+  input[type="text"], select, textarea{
+    width:100%; padding:10px; border-radius:10px; border:none; outline:none;
+    background: rgba(255,255,255,0.1); color:#fff;
+  }
+
+  button{
+    padding:10px 15px; border:none; border-radius:12px;
+    background: linear-gradient(90deg,#7c3aed,#06b6d4);
+    color:#fff; font-weight:bold; cursor:pointer; transition:0.3s;
+    width:100%;
+  }
+  button:hover{opacity:0.85;}
+
+  .result{
+    margin-top:20px;
+    background: rgba(255,255,255,0.05);
+    padding:15px; border-radius:15px;
+    text-align:center;
+  }
+
+  .history{
+    margin-top:20px;
+  }
+
+  .history-item{
+    background: rgba(255,255,255,0.03); padding:10px; border-radius:10px;
+    margin-bottom:10px; color:#ddd;
+  }
+
+  @media(max-width:600px){
+    .container{padding:20px 15px;}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Smart Health Prediction</h1>
+  <div class="form-group">
+    <label for="symptoms">Enter Symptoms (comma separated)</label>
+    <input type="text" id="symptoms" placeholder="e.g., fever, cough, headache">
+  </div>
+  <button onclick="predictDisease()">Predict Disease</button>
+
+  <div class="result" id="result"></div>
+
+  <div class="history">
+    <h2>Prediction History</h2>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script>
+const resultDiv = document.getElementById('result');
+const historyList = document.getElementById('historyList');
+let history = JSON.parse(localStorage.getItem('predictionHistory') || '[]');
+
+function dummyPrediction(symptoms){
+  const s = symptoms.toLowerCase();
+  if(s.includes('fever') && s.includes('cough')) return 'Common Cold / Flu';
+  if(s.includes('headache') && s.includes('nausea')) return 'Migraine';
+  if(s.includes('chest pain') && s.includes('shortness of breath')) return 'Heart Problem';
+  if(s.includes('stomach') && s.includes('pain')) return 'Digestive Issue';
+  return 'Unknown / Consult a doctor';
+}
+
+function renderHistory(){
+  historyList.innerHTML='';
+  history.slice().reverse().forEach(item=>{
+    const div=document.createElement('div');
+    div.className='history-item';
+    div.textContent=`Symptoms: ${item.symptoms} → Prediction: ${item.prediction}`;
+    historyList.appendChild(div);
+  });
+}
+
+function predictDisease(){
+  const symptoms = document.getElementById('symptoms').value.trim();
+  if(!symptoms){ alert('Please enter symptoms'); return; }
+  const prediction = dummyPrediction(symptoms);
+  resultDiv.innerHTML=`<h2>Prediction: ${prediction}</h2>`;
+
+  history.push({symptoms, prediction});
+  if(history.length>10) history.shift();
+  localStorage.setItem('predictionHistory', JSON.stringify(history));
+  renderHistory();
+}
+
+// Render history on load
+renderHistory();
+</script>
+</body>
+</html>

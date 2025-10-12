@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Weather App</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Roboto', sans-serif;
+    display:flex; justify-content:center; align-items:center;
+    min-height:100vh; background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff; padding:15px;
+  }
+  .container{
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    padding:25px 30px;
+    border-radius:20px;
+    width:100%; max-width:380px;
+    text-align:center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  }
+  h1{margin-bottom:15px; font-size:1.5rem; color:#06b6d4;}
+  input[type="text"]{
+    width:100%; padding:10px 12px; border-radius:10px; border:none;
+    outline:none; font-size:1rem; margin-bottom:10px; background: rgba(255,255,255,0.1); color:#fff;
+  }
+  button{
+    padding:10px 15px; border:none; border-radius:10px;
+    background: linear-gradient(90deg,#7c3aed,#06b6d4); color:#fff;
+    font-weight:bold; cursor:pointer; transition:0.3s;
+    width:100%;
+  }
+  button:hover{opacity:0.85;}
+  .weather-result{margin-top:20px;}
+  .weather-result img{width:80px;height:80px;}
+  .temp{font-size:2rem; font-weight:700;}
+  .desc{text-transform:capitalize; margin:6px 0; font-size:1rem;}
+  .info{font-size:0.9rem; color:rgba(255,255,255,0.75); margin-bottom:10px;}
+  .history{margin-top:15px; text-align:left;}
+  .history h3{font-size:1rem; color:#7c3aed; margin-bottom:6px;}
+  .history button{
+    display:block; width:100%; margin:4px 0; text-align:left; padding:6px 10px;
+    background: rgba(255,255,255,0.1); color:#fff; border:none; border-radius:8px; cursor:pointer;
+    transition:0.2s;
+  }
+  .history button:hover{background: rgba(255,255,255,0.2);}
+  @media(max-width:420px){.container{padding:20px 15px;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Smart Weather App</h1>
+  <input type="text" id="cityInput" placeholder="Enter city name">
+  <button onclick="getWeather()">Get Weather</button>
+
+  <div class="weather-result" id="weatherResult"></div>
+
+  <div class="history" id="history">
+    <h3>Recent Searches:</h3>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script>
+const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your OpenWeatherMap API key
+const weatherResult = document.getElementById('weatherResult');
+const cityInput = document.getElementById('cityInput');
+const historyList = document.getElementById('historyList');
+
+let history = JSON.parse(localStorage.getItem('weatherHistory') || '[]');
+
+function saveHistory(city){
+  city = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+  if(!history.includes(city)){
+    history.unshift(city);
+    if(history.length>5) history.pop();
+    localStorage.setItem('weatherHistory', JSON.stringify(history));
+  }
+  renderHistory();
+}
+
+function renderHistory(){
+  historyList.innerHTML = '';
+  history.forEach(city=>{
+    const btn = document.createElement('button');
+    btn.textContent = city;
+    btn.onclick = ()=>{ cityInput.value=city; getWeather(); };
+    historyList.appendChild(btn);
+  });
+}
+
+async function getWeather(){
+  const city = cityInput.value.trim();
+  if(!city){ alert('Please enter city name'); return; }
+
+  try{
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+    if(!res.ok) throw new Error('City not found');
+    const data = await res.json();
+    const { temp, humidity } = data.main;
+    const { description, icon } = data.weather[0];
+    const windSpeed = data.wind.speed;
+
+    weatherResult.innerHTML = `
+      <img src="https://openweathermap.org/img/wn/${icon}@2x.png" alt="icon">
+      <div class="temp">${temp}°C</div>
+      <div class="desc">${description}</div>
+      <div class="info">Humidity: ${humidity}% | Wind: ${windSpeed} m/s</div>
+    `;
+    saveHistory(city);
+  }catch(err){
+    weatherResult.innerHTML = `<div class="desc">Error: ${err.message}</div>`;
+  }
+}
+
+// Render history on load
+renderHistory();
+</script>
+</body>
+</html>
