@@ -1,0 +1,108 @@
+import os
+import json
+
+# ========== Model ==========
+class User:
+    def __init__(self, username, password, email):
+        self.username = username
+        self.password = password  # In real apps, never store plain passwords!
+        self.email = email
+
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "password": self.password,
+            "email": self.email
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return User(data['username'], data['password'], data['email'])
+
+# ========== File Handling ==========
+class FileHandler:
+    FILE_PATH = 'users.txt'
+
+    @staticmethod
+    def load_users():
+        if not os.path.exists(FileHandler.FILE_PATH):
+            return []
+        with open(FileHandler.FILE_PATH, 'r') as f:
+            try:
+                return [User.from_dict(u) for u in json.load(f)]
+            except json.JSONDecodeError:
+                return []
+
+    @staticmethod
+    def save_users(users):
+        with open(FileHandler.FILE_PATH, 'w') as f:
+            json.dump([u.to_dict() for u in users], f, indent=4)
+
+# ========== Business Logic ==========
+class UserManager:
+    def __init__(self):
+        self.users = FileHandler.load_users()
+
+    def register_user(self, username, password, email):
+        if any(u.username == username for u in self.users):
+            print("❌ Username already exists.")
+            return False
+        new_user = User(username, password, email)
+        self.users.append(new_user)
+        FileHandler.save_users(self.users)
+        print("✅ User registered successfully.")
+        return True
+
+    def login_user(self, username, password):
+        for user in self.users:
+            if user.username == username and user.password == password:
+                print("✅ Login successful.")
+                return user
+        print("❌ Invalid credentials.")
+        return None
+
+    def view_profile(self, user: User):
+        print("\n--- 👤 User Profile ---")
+        print(f"Username: {user.username}")
+        print(f"Email: {user.email}")
+        print("----------------------\n")
+
+# ========== UI / CLI ==========
+def show_menu():
+    print("""
+========= Welcome =========
+1. Register
+2. Login
+3. Exit
+===========================
+""")
+
+def main():
+    manager = UserManager()
+
+    while True:
+        show_menu()
+        choice = input("Choose an option (1-3): ")
+
+        if choice == '1':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            email = input("Enter email: ")
+            manager.register_user(username, password, email)
+
+        elif choice == '2':
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            user = manager.login_user(username, password)
+            if user:
+                manager.view_profile(user)
+
+        elif choice == '3':
+            print("👋 Exiting the program. Goodbye!")
+            break
+
+        else:
+            print("❌ Invalid option. Try again.")
+
+if __name__ == "__main__":
+    main()
