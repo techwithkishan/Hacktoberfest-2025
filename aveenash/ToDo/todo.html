@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animated To-Do List</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<style>
+body {
+  margin:0;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg,#ff9a9e,#fad0c4,#fbc2eb,#a18cd1);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+
+@keyframes gradientBG {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+.container{
+  background: rgba(0,0,0,0.8);
+  padding:25px;
+  border-radius:20px;
+  width: 100%;
+  max-width:400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h1{
+  color:#fff;
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.input-container{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  font-size:16px;
+}
+
+button{
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  background:#28a745;
+  color:#fff;
+  cursor:pointer;
+  font-size:16px;
+}
+
+button:hover{background:#3cd065;}
+
+ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+li{
+  background: rgba(255,255,255,0.1);
+  padding:10px 15px;
+  border-radius:8px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+}
+
+li.completed{
+  text-decoration:line-through;
+  opacity:0.6;
+}
+
+.delete-btn{
+  background:#ff3b30;
+  border:none;
+  color:#fff;
+  padding:5px 10px;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.delete-btn:hover{background:#ff5c50;}
+
+@media(max-width:450px){
+  .container{padding:20px;}
+  input{font-size:14px;}
+  button{font-size:14px;}
+  li{font-size:14px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>To-Do List</h1>
+  <div class="input-container">
+    <input type="text" id="taskInput" placeholder="Add a new task...">
+    <button id="addBtn">Add</button>
+  </div>
+  <ul id="taskList"></ul>
+</div>
+
+<script>
+const input = document.getElementById('taskInput');
+const addBtn = document.getElementById('addBtn');
+const taskList = document.getElementById('taskList');
+
+// Add task
+addBtn.addEventListener('click',()=> addTask());
+input.addEventListener('keypress', e=>{
+  if(e.key==='Enter') addTask();
+});
+
+function addTask(){
+  const taskText = input.value.trim();
+  if(taskText==='') return;
+
+  const li = document.createElement('li');
+  li.textContent = taskText;
+
+  const delBtn = document.createElement('button');
+  delBtn.textContent='Delete';
+  delBtn.classList.add('delete-btn');
+  li.appendChild(delBtn);
+
+  taskList.appendChild(li);
+  input.value='';
+
+  // Animate addition
+  gsap.from(li,{opacity:0,x:-100,duration:0.5,ease:"power2.out"});
+
+  // Toggle complete
+  li.addEventListener('click', e=>{
+    if(e.target!==delBtn){
+      li.classList.toggle('completed');
+      gsap.to(li,{scale:1.05,duration:0.1,yoyo:true,repeat:1});
+    }
+  });
+
+  // Delete task
+  delBtn.addEventListener('click',()=>{
+    gsap.to(li,{opacity:0,x:100,duration:0.5,onComplete:()=>li.remove()});
+  });
+}
+</script>
+</body>
+</html>
