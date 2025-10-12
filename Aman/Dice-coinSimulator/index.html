@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dice & Coin Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🎲 Dice & 🪙 Coin Simulator</h1>
+
+    <div class="buttons">
+      <button onclick="rollDice()">Roll Dice 🎲</button>
+      <button onclick="flipCoin()">Flip Coin 🪙</button>
+    </div>
+
+    <div class="results">
+      <div id="diceResult" class="result">
+        <p>🎲 Dice: <span id="diceValue">-</span></p>
+        <img id="diceImage" src="" alt="Dice" />
+      </div>
+      <div id="coinResult" class="result">
+        <p>🪙 Coin: <span id="coinValue">-</span></p>
+        <img id="coinImage" src="" alt="Coin" />
+      </div>
+    </div>
+
+    <div class="history">
+      <h3>History</h3>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
