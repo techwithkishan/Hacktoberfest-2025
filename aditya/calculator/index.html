@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculator</title>
+  <style>
+    :root{
+      --bg:#0f1724; /* dark navy */
+      --card:#0b1220;
+      --accent:#7c3aed; /* purple */
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.03);
+      --button-bg: rgba(255,255,255,0.03);
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background:linear-gradient(180deg,var(--bg),#071024 120%);
+      display:flex;align-items:center;justify-content:center;padding:24px;color:#e6eef8;
+    }
+
+    .calculator{
+      width:360px;
+      max-width:96vw;
+      background:linear-gradient(180deg,var(--card),#071022);
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+      padding:20px;
+      display:flex;flex-direction:column;gap:14px;
+    }
+
+    .top-row{display:flex;justify-content:space-between;align-items:center}
+    .brand{font-weight:700;letter-spacing:0.3px}
+    .small{color:var(--muted);font-size:12px}
+
+    .display{
+      background:var(--glass);
+      padding:16px;border-radius:12px;display:flex;flex-direction:column;gap:6px;min-height:84px;align-items:flex-end;
+      word-break:break-all;
+    }
+    .history{font-size:13px;color:var(--muted);opacity:0.9}
+    .result{font-size:28px;font-weight:600}
+
+    .pad{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+    }
+    button{
+      border:0;padding:14px;border-radius:10px;font-size:18px;font-weight:600;background:var(--button-bg);color:inherit;cursor:pointer;outline:none;
+      box-shadow:0 6px 14px rgba(2,6,23,0.5);
+      transition:transform .06s ease,box-shadow .06s ease,background .12s ease;
+    }
+    button:active{transform:translateY(2px)}
+    button:hover{filter:brightness(1.06)}
+    .btn-operator{background:linear-gradient(180deg, rgba(124,58,237,0.16), rgba(124,58,237,0.08));color:var(--accent)}
+    .btn-equals{grid-column:span 2;background:linear-gradient(180deg,var(--accent),#5b21b6);color:white}
+    .btn-clear{background:transparent;color:var(--muted);font-weight:700}
+    .btn-accent{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
+
+    @media (max-width:420px){
+      .calculator{padding:16px}
+      .result{font-size:22px}
+      button{padding:12px;font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator" role="application" aria-label="Calculator">
+    <div class="top-row">
+      <div class="brand">Calc • Simple</div>
+      <div class="small">Click or use keyboard</div>
+    </div>
+
+    <div class="display" id="display" aria-live="polite">
+      <div class="history" id="history">&nbsp;</div>
+      <div class="result" id="result">0</div>
+    </div>
+
+    <div class="pad" id="pad">
+      <button class="btn-clear" data-action="clear" aria-label="All Clear">AC</button>
+      <button class="btn-clear" data-action="back" aria-label="Backspace">⌫</button>
+      <button class="btn-operator" data-value="%">%</button>
+      <button class="btn-operator" data-value="/">÷</button>
+
+      <button data-value="7">7</button>
+      <button data-value="8">8</button>
+      <button data-value="9">9</button>
+      <button class="btn-operator" data-value="*">×</button>
+
+      <button data-value="4">4</button>
+      <button data-value="5">5</button>
+      <button data-value="6">6</button>
+      <button class="btn-operator" data-value="-">−</button>
+
+      <button data-value="1">1</button>
+      <button data-value="2">2</button>
+      <button data-value="3">3</button>
+      <button class="btn-operator" data-value="+">+</button>
+
+      <button data-value="0">0</button>
+      <button data-value=".">.</button>
+      <button class="btn-operator" data-value="(">(</button>
+      <button class="btn-operator" data-value=")">)</button>
+
+      <button class="btn-accent" data-action="toggle-sign">+/-</button>
+      <button class="btn-equals" data-action="equals" aria-label="Equals">=</button>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const display = document.getElementById('result');
+      const history = document.getElementById('history');
+      const pad = document.getElementById('pad');
+
+      let expr = '';
+      let lastResult = null;
+
+      function refresh(){
+        display.textContent = expr === '' ? '0' : expr;
+        history.textContent = lastResult === null ? '\u00A0' : ('Ans = ' + lastResult);
+      }
+
+      function append(char){
+        // prevent malicious input: only allow digits, operators and parentheses and dot and percent
+        expr += char;
+        refresh();
+      }
+
+      function backspace(){
+        expr = expr.slice(0,-1);
+        refresh();
+      }
+
+      function clearAll(){
+        expr = '';
+        lastResult = null;
+        refresh();
+      }
+
+      function toggleSign(){
+        // try to toggle sign of the last number in the expression
+        // find last number with regex
+        const m = expr.match(/(\d*\.?\d+)$/);
+        if(m){
+          const num = m[1];
+          const start = expr.length - num.length;
+          const toggled = num.startsWith('-') ? num.slice(1) : '-' + num;
+          expr = expr.slice(0,start) + toggled;
+          refresh();
+        }
+      }
+
+      function safeEvaluate(input){
+        // only allow characters 0-9 + - * / . ( ) % and spaces
+        if(!/^[0-9+\-*/().%\s]+$/.test(input)){
+          throw new Error('Invalid characters');
+        }
+        // replace ÷ and × if present
+        const safe = input.replace(/×/g,'*').replace(/÷/g,'/');
+        // treat percentage operator: convert occurrences like '50%' to '(50/100)'
+        const withPercent = safe.replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
+        // evaluate with Function to reduce eval scope
+        // still run in try/catch
+        // eslint-disable-next-line no-new-func
+        return Function('return (' + withPercent + ')')();
+      }
+
+      function calculate(){
+        try{
+          if(expr.trim() === '') return;
+          const val = safeEvaluate(expr);
+          lastResult = Number.isFinite(val) ? val : 'Error';
+          expr = String(lastResult);
+          refresh();
+        }catch(e){
+          display.textContent = 'Error';
+        }
+      }
+
+      pad.addEventListener('click', (e) =>{
+        const btn = e.target.closest('button');
+        if(!btn) return;
+        const action = btn.dataset.action;
+        const val = btn.dataset.value;
+        if(action === 'clear') clearAll();
+        else if(action === 'back') backspace();
+        else if(action === 'equals') calculate();
+        else if(action === 'toggle-sign') toggleSign();
+        else if(val) append(val);
+      });
+
+      // keyboard support
+      window.addEventListener('keydown', (e) =>{
+        if(e.key === 'Enter'){
+          e.preventDefault(); calculate();
+          return;
+        }
+        if(e.key === 'Backspace'){
+          e.preventDefault(); backspace(); return;
+        }
+        if(e.key === 'Escape'){
+          e.preventDefault(); clearAll(); return;
+        }
+        // allow digits, operators and parentheses and percent and dot
+        if(/^[0-9+\-*/().%]$/.test(e.key)){
+          append(e.key);
+          e.preventDefault();
+        }
+      });
+
+      // initialize
+      refresh();
+    })();
+  </script>
+</body>
+</html>
