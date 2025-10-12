@@ -51,8 +51,22 @@ class BankTask implements Runnable {
 
     @Override
     public void run() {
-        account.deposit(2000);
-        account.withdraw(1000);
+        Random rand = new Random();
+        // Perform 5 random deposit/withdrawal operations
+        for (int i = 0; i < 5; i++) {
+            boolean depositOp = rand.nextBoolean();
+            double amount = 500 + rand.nextInt(2000); // random amount between 500 and 2500
+            if (depositOp) {
+                account.deposit(amount);
+            } else {
+                account.withdraw(amount);
+            }
+            try {
+                Thread.sleep(rand.nextInt(200)); // random short delay
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }
 
@@ -73,17 +87,28 @@ public class BankSystem {
             System.out.println(acc);
         }
 
-        // Multithreading: Each account will have multiple transactions
-        System.out.println("\n=== Starting Transactions (Multithreading) ===");
+        // Multithreading: Each account will have multiple random transactions
+        System.out.println("\n=== Starting Random Transactions (Multithreading) ===");
         List<Thread> threads = new ArrayList<>();
 
         for (BankAccount acc : bankAccounts.values()) {
-            Thread t1 = new Thread(new BankTask(acc), acc.getAccountHolder() + "-Thread1");
-            Thread t2 = new Thread(new BankTask(acc), acc.getAccountHolder() + "-Thread2");
-            threads.add(t1);
-            threads.add(t2);
-            t1.start();
-            t2.start();
+            // 4 threads per account for random deposit/withdrawal
+            for (int i = 1; i <= 4; i++) {
+                Thread t = new Thread(new BankTask(acc), acc.getAccountHolder() + "-RandomThread" + i);
+                threads.add(t);
+                t.start();
+            }
+        }
+
+        // Simultaneous overdraw attempts: 3 threads per account try to overdraw
+        System.out.println("\n=== Simultaneous Overdraw Attempts ===");
+        for (BankAccount acc : bankAccounts.values()) {
+            double overdrawAmount = acc.getBalance() + 5000; // always more than available
+            for (int i = 1; i <= 3; i++) {
+                Thread t = new Thread(() -> acc.withdraw(overdrawAmount), acc.getAccountHolder() + "-OverdrawThread" + i);
+                threads.add(t);
+                t.start();
+            }
         }
 
         // Wait for all threads to finish
