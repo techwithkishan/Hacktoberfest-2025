@@ -1,5 +1,7 @@
 import java.util.*;
 
+import Product.Product;
+
 // OOP: Product class
 class Product {
     private String name;
