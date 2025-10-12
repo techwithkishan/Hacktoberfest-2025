@@ -44,15 +44,28 @@ public class Arthmetic {
         System.out.println("The Sum is: " + add);
         int sub = a - b;
         System.out.println("The Difference is: " + sub);
-        double div = 1.0 * a / b;
-        System.out.println("The Division is: " + div);
+        if (b == 0) {
+            System.out.println("Division by zero is not allowed.");
+        } else {
+            double div = 1.0 * a / b;
+            System.out.println("The Division is: " + div);
+        }
         int multi = a * b;
         System.out.println("The Multiplication is: " + multi);
         long exp = (long) Math.pow(a, b);
         System.out.println("The Exponent is: " + exp);
-        double inverseA = 1.0 / a, inverseB = 1.0 / b;
-        System.out.println("The Inverse of a is: " + inverseA);
-        System.out.println("The Inverse of b is: " + inverseB);
+        if (a == 0) {
+            System.out.println("Inverse of a is undefined.");
+        } else {
+            double inverseA = 1.0 / a;
+            System.out.println("The Inverse is: " + inverseA);
+        }
+        if (b == 0) {
+            System.out.println("Inverse of b is undefined.");
+        } else {
+            double inverseB = 1.0 / b;
+            System.out.println("The Inverse is: " + inverseB);
+        }
         int modInv = modInverse(a, b);
         if (modInv == -1) {
             System.out.println("Modular Inverse doesn't exist");
