@@ -10,6 +10,7 @@ import projectRouter from "./routes/projects.routes"
 import healthRouter from "./routes/health.routes"
 import { Middleware_404 } from './middleware/404HandlingMiddleware';
 import { errorMiddleware } from './middleware/errorHandlingMiddleware';
+import { limiter } from './middleware/rateLimiterMiddleware';
 // Load environment variables
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-
+app.use(limiter)
 app.use(healthRouter)
 app.use(statsRouter)
 app.use(contributorsRouter)
