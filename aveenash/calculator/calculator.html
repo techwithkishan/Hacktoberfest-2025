@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Scientific Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+    <style>
+        /* Full screen gradient background */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Calculator container */
+        .calculator {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 450px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Display */
+        .display {
+            background: #1c1c2b;
+            color: #fff;
+            font-size: 2rem;
+            text-align: right;
+            padding: 15px 20px;
+            border-radius: 15px;
+            overflow-x: auto;
+            min-height: 60px;
+        }
+
+        /* History panel */
+        .history {
+            background: #2e2e3e;
+            color: #ccc;
+            font-size: 0.9rem;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        /* Buttons grid */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 18px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #fff;
+            background: #3b3b4d;
+            box-shadow: 0 5px #272736;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #4b4b63;
+        }
+
+        .operator {
+            background: #ff9500;
+            box-shadow: 0 5px #b26f00;
+        }
+
+        .operator:hover {
+            background: #ffa733;
+        }
+
+        .equal {
+            background: #28a745;
+            box-shadow: 0 5px #1e6b33;
+        }
+
+        .equal:hover {
+            background: #3cd065;
+        }
+
+        .clear {
+            background: #ff3b30;
+            box-shadow: 0 5px #b22c22;
+        }
+
+        .clear:hover {
+            background: #ff5c50;
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        .dot {
+            background: #6c5ce7;
+            box-shadow: 0 5px #4a3bc2;
+        }
+
+        .dot:hover {
+            background: #7d6fff;
+        }
+
+        .scientific {
+            background: #ff6b81;
+            box-shadow: 0 5px #b23c51;
+        }
+
+        .scientific:hover {
+            background: #ff8099;
+        }
+
+        /* Responsive */
+        @media(max-width:500px) {
+            .calculator {
+                padding: 15px;
+            }
+
+            .display {
+                font-size: 1.6rem;
+                padding: 12px;
+            }
+
+            .buttons {
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="history" id="history"></div>
+        <div class="buttons">
+            <!-- Row 1 -->
+            <button class="btn clear" id="clear">C</button>
+            <button class="btn operator" data-operator="/">&#247;</button>
+            <button class="btn operator" data-operator="*">&times;</button>
+            <button class="btn operator" data-operator="-">-</button>
+            <button class="btn operator" data-operator="+">+</button>
+            <!-- Row 2 -->
+            <button class="btn scientific" data-func="sin">sin</button>
+            <button class="btn scientific" data-func="cos">cos</button>
+            <button class="btn scientific" data-func="tan">tan</button>
+            <button class="btn scientific" data-func="log">log</button>
+            <button class="btn scientific" data-func="sqrt">√</button>
+            <!-- Row 3 -->
+            <button class="btn number" data-number="7">7</button>
+            <button class="btn number" data-number="8">8</button>
+            <button class="btn number" data-number="9">9</button>
+            <button class="btn operator" data-operator="^">^</button>
+            <button class="btn dot" data-dot=".">.</button>
+            <!-- Row 4 -->
+            <button class="btn number" data-number="4">4</button>
+            <button class="btn number" data-number="5">5</button>
+            <button class="btn number" data-number="6">6</button>
+            <button class="btn number" data-number="1">1</button>
+            <button class="btn number" data-number="2">2</button>
+            <!-- Row 5 -->
+            <button class="btn number" data-number="3">3</button>
+            <button class="btn number zero" data-number="0">0</button>
+            <button class="btn equal" id="equals">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        const historyEl = document.getElementById('history');
+        const buttons = document.querySelectorAll('.btn');
+        let currentInput = '', operator = '', previousInput = '';
+
+        function updateDisplay(value) {
+            display.textContent = value;
+            gsap.fromTo(display, { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3 });
+        }
+
+        function addHistory(entry) {
+            const p = document.createElement('p');
+            p.textContent = entry;
+            historyEl.prepend(p);
+        }
+
+        // Button clicks
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.classList.contains('number')) {
+                    currentInput += btn.dataset.number; updateDisplay(currentInput);
+                } else if (btn.classList.contains('dot')) {
+                    if (!currentInput.includes('.')) { currentInput += '.'; updateDisplay(currentInput); }
+                } else if (btn.classList.contains('operator')) {
+                    if (currentInput === '' && previousInput !== '') operator = btn.dataset.operator;
+                    else if (currentInput !== '') {
+                        if (previousInput !== '') calculate();
+                        else previousInput = currentInput;
+                        operator = btn.dataset.operator;
+                        currentInput = '';
+                    }
+                } else if (btn.classList.contains('scientific')) {
+                    if (currentInput !== '') {
+                        let value = parseFloat(currentInput);
+                        switch (btn.dataset.func) {
+                            case 'sin': value = Math.sin(value * Math.PI / 180); break;
+                            case 'cos': value = Math.cos(value * Math.PI / 180); break;
+                            case 'tan': value = Math.tan(value * Math.PI / 180); break;
+                            case 'log': value = Math.log10(value); break;
+                            case 'sqrt': value = Math.sqrt(value); break;
+                        }
+                        currentInput = value.toString();
+                        updateDisplay(currentInput);
+                        addHistory(btn.dataset.func + "(" + currentInput + ")=" + value);
+                    }
+                } else if (btn.classList.contains('equal')) {
+                    if (currentInput !== '' && previousInput !== '') calculate();
+                } else if (btn.classList.contains('clear')) {
+                    currentInput = ''; previousInput = ''; operator = ''; updateDisplay('0');
+                }
+            });
+        });
+
+        function calculate() {
+            let result;
+            let prev = parseFloat(previousInput);
+            let curr = parseFloat(currentInput);
+            switch (operator) {
+                case '+': result = prev + curr; break;
+                case '-': result = prev - curr; break;
+                case '*': result = prev * curr; break;
+                case '/': result = prev / curr; break;
+                case '^': result = Math.pow(prev, curr); break;
+                default: return;
+            }
+            result = Math.round(result * 100000) / 100000;
+            addHistory(previousInput + " " + operator + " " + currentInput + " = " + result);
+            updateDisplay(result);
+            previousInput = result.toString();
+            currentInput = ''; operator = '';
+        }
+    </script>
+</body>
+
+</html>
