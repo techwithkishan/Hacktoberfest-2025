@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Student Management System</h1>
+            <p>Efficiently manage student records and information</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card">
+                <h3>Total Students</h3>
+                <div class="count" id="totalStudents">0</div>
+            </div>
+            <div class="card">
+                <h3>Active Students</h3>
+                <div class="count" id="activeStudents">0</div>
+            </div>
+            <div class="card">
+                <h3>Average Grade</h3>
+                <div class="count" id="averageGrade">0.0</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="addStudentBtn">
+                <i>+</i> Add New Student
+            </button>
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search students by name, ID, or course...">
+                <button class="btn btn-secondary" id="searchBtn">Search</button>
+            </div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="form-container" id="studentForm">
+            <h2 id="formTitle">Add New Student</h2>
+            <form id="studentDataForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <input type="text" class="form-control" id="studentId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" class="form-control" id="phone">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="course">Course</label>
+                        <input type="text" class="form-control" id="course" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="grade">Grade</label>
+                        <input type="number" class="form-control" id="grade" min="0" max="100" step="0.1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-success">Save Student</button>
+                    <button type="button" class="btn btn-danger" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- Student data will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <p>Student Management System &copy; 2023</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
