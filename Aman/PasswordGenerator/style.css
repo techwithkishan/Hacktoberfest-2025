@@ -1,0 +1,109 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #141e30, #243b55);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.output {
+  display: flex;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.output input {
+  flex: 1;
+  padding: 0.7rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  color: #333;
+}
+
+#copy-btn {
+  padding: 0.7rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.settings {
+  text-align: left;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.settings label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+button#generate {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.3s;
+}
+
+button#generate:hover {
+  background-color: #1976d2;
+}
+
+.strength {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.strength span {
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+}
+
+.weak {
+  background-color: #f44336;
+}
+
+.medium {
+  background-color: #ff9800;
+}
+
+.strong {
+  background-color: #4caf50;
+}
