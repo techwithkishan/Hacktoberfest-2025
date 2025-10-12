@@ -1,0 +1,42 @@
+import java.util.*;
+
+class Student {
+    int rollNo;
+    String name;
+    double grade;
+
+    public Student(int rollNo, String name, double grade) {
+        this.rollNo = rollNo;
+        this.name = name;
+        this.grade = grade;
+    }
+}
+
+public class StudentManagement {
+    static List<Student> students = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while(true) {
+            System.out.println("1. Add student\n2. Display students\n3. Exit");
+            int choice = sc.nextInt();
+            if(choice == 1) {
+                System.out.print("Enter roll number: ");
+                int rollNo = sc.nextInt();
+                sc.nextLine(); // consume newline
+                System.out.print("Enter name: ");
+                String name = sc.nextLine();
+                System.out.print("Enter grade: ");
+                double grade = sc.nextDouble();
+                students.add(new Student(rollNo, name, grade));
+            } else if(choice == 2) {
+                for(Student s : students) {
+                    System.out.println("Roll No: " + s.rollNo + ", Name: " + s.name + ", Grade: " + s.grade);
+                }
+            } else {
+                break;
+            }
+        }
+        sc.close();
+    }
+}
