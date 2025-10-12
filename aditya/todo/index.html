@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Todo List</title>
+ <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <main class="app" aria-labelledby="app-title">
+    <div class="header">
+      <h1 id="app-title">My Todo List</h1>
+      <div class="small">Organize your day • Autosave ✔</div>
+    </div>
+
+    <form id="addForm" class="input-row" aria-label="Add todo">
+      <input id="taskInput" type="text" placeholder="Add a new task and press Enter" autocomplete="off" aria-label="New task" />
+      <button type="submit" aria-label="Add task">Add</button>
+    </form>
+
+    <div class="controls">
+      <div class="filters" role="tablist" aria-label="Filter tasks">
+        <button data-filter="all" class="active" role="tab" aria-selected="true">All</button>
+        <button data-filter="active" role="tab">Active</button>
+        <button data-filter="completed" role="tab">Completed</button>
+      </div>
+      <div class="small" id="count">0 tasks</div>
+    </div>
+
+    <section class="todo-list" id="todoList" aria-live="polite"></section>
+
+    <div class="footer">
+      <div class="small" id="lastSaved">Not saved yet</div>
+      <div>
+        <button id="clearCompleted" class="clear">Clear completed</button>
+        <button id="export" class="clear">Export</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
