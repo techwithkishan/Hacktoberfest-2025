@@ -1,17 +1,80 @@
 import java.util.*;
+
 public class Arthmetic {
+    public static int modInverse(int a, int m) {
+        a = a % m;
+        for (int x = 1; x < m; x++) {
+            if ((a * x) % m == 1) {
+                return x;
+            }
+        }
+        return -1; // Inverse doesn't exist
+    }
+
+    public static int gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
+
     public static void main(String[] args) {
-        Scanner sc  = new Scanner(System.in);
-        System.out.println("Enter first number:");
-        int a = sc.nextInt();
-        System.out.println("Enter Second Number");
-        int b = sc.nextInt();
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter first number: ");
+        int a, b;
+        try {
+            a = sc.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter an integer.");
+            sc.close();
+            return;
+        }
 
-        int add  = a+b;
-        int sub = a-b;
-        int div = a/b;
-        int multi = a*b;
+        System.out.print("Enter Second Number: ");
+        try {
+            b = sc.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter an integer.");
+            sc.close();
+            return;
+        }
+        sc.close();
 
-        System.out.println("The Arthmetic are:"+" "+add+ " "+sub+" "+div+ " " +multi );
+        int add = a + b;
+        System.out.println("The Sum is: " + add);
+        int sub = a - b;
+        System.out.println("The Difference is: " + sub);
+        if (b == 0) {
+            System.out.println("Division by zero is not allowed.");
+        } else {
+            double div = 1.0 * a / b;
+            System.out.println("The Division is: " + div);
+        }
+        int multi = a * b;
+        System.out.println("The Multiplication is: " + multi);
+        long exp = (long) Math.pow(a, b);
+        System.out.println("The Exponent is: " + exp);
+        if (a == 0) {
+            System.out.println("Inverse of a is undefined.");
+        } else {
+            double inverseA = 1.0 / a;
+            System.out.println("The Inverse is: " + inverseA);
+        }
+        if (b == 0) {
+            System.out.println("Inverse of b is undefined.");
+        } else {
+            double inverseB = 1.0 / b;
+            System.out.println("The Inverse is: " + inverseB);
+        }
+        int modInv = modInverse(a, b);
+        if (modInv == -1) {
+            System.out.println("Modular Inverse doesn't exist");
+        } else {
+            System.out.println("The Modular Inverse is: " + modInv);
+        }
+        int mod = a % b;
+        System.out.println("The Modulus is: " + mod);
+        int gcdVal = gcd(a, b);
+        System.out.println("The GCD is: " + gcdVal);
     }
 }
