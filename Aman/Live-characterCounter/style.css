@@ -1,0 +1,81 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  color: #fff;
+}
+
+.container {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #e0e0e0;
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  padding: 1rem;
+  border-radius: 8px;
+  border: none;
+  resize: none;
+  font-size: 1rem;
+  outline: none;
+  background: #ffffffcc;
+  color: #333;
+}
+
+.counter {
+  margin-top: 0.8rem;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.3rem;
+  border-radius: 5px;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.counter.normal {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.counter.warning {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.counter.danger {
+  background-color: #f44336;
+  color: #fff;
+}
+
+@media (max-width: 500px) {
+  textarea {
+    height: 100px;
+  }
+}
