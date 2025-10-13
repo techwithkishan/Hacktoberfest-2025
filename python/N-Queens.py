@@ -83,3 +83,15 @@ if __name__ == "__main__":
     print("\nSolving for N = 4...")
     four_queens_solutions = solve_n_queens(4)
     print_solutions(four_queens_solutions)
+
+# Note: Complexity Analysis
+
+# Time Complexity: O(N!)
+#   - The problem is about finding a permutation of queen placements on the board
+#   - The optimizations using sets help prune the search space significantly, but in the worst case, the time complexity remains O(N!)
+
+# Space Complexity: O(N^2)
+#   - The primary space cost is the N x N board itself, which requires O(N^2) space
+#   - The recursion stack goes at most N levels deep, contributing O(N)
+#   - The helper sets used for optimization also take O(N) space
+#   - Therefore, the board size is the dominant factor

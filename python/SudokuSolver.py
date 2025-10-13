@@ -100,3 +100,15 @@ if __name__ == "__main__":
         print_board(puzzle, "Solved Puzzle:")
     else:
         print("No solution exists for the given puzzle.")
+
+# Note: Complexity Analysis
+
+# Let M be the number of empty cells on the board.
+
+# Time Complexity: O(9^M)
+#   1. In the worst case, the algorithm must try all possible numbers (1-9) for each of the M empty cells
+#   2. This creates a search tree with a branching factor of up to 9 and a depth of M, leading to an exponential runtime of 9^M
+
+# Space Complexity: O(M)
+#   1. The space is dominated by the depth of the recursion stack. In the worst case, the stack can go M levels deep, one for each empty cell
+#   2. The board (9x9) and the helper sets for rows, columns, and boxes occupy a constant amount of space, O(1), as their size does not depend on the input puzzle's difficulty
