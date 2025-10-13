@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSRF Protected Form</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <h1>CSRF Protected Form</h1>
+    
+    <form id="csrf-form" method="POST" action="/submit">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        
+        <div>
+            <label for="data">Data:</label>
+            <input type="text" id="data" name="data" required>
+        </div>
+        
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // For AJAX requests, include CSRF token in headers
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        // Example AJAX call
+        function makeApiCall() {
+            fetch('/api/data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken
+                },
+                body: JSON.stringify({ key: 'value' })
+            })
+            .then(response => response.json())
+            .then(data => console.log(data));
+        }
+    </script>
+</body>
+</html>
