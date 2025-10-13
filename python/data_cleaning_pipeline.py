@@ -241,4 +241,4 @@ class DataCleaningPipeline:
         report = self.create_cleaning_report(df, df_clean)
         
         print("Data cleaning pipeline completed successfully!")
-        return df_clean, report
+        return df_clean, report 
