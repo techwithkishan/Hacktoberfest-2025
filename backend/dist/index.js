@@ -18,7 +18,8 @@ const authRoutes = require("./routes/authRoutes");
 // Middleware
 const { Middleware_404 } = require("./middleware/404HandlingMiddleware");
 const { errorMiddleware } = require("./middleware/errorHandlingMiddleware");
-const { limiter } = require("./middleware/rateLimiterMiddleware");
+const { limiter, authLimiter } = require("./middleware/rateLimiterMiddleware");
+
 
 // Load environment variables from .env file
 dotenv.config();
@@ -40,7 +41,7 @@ app.use(limiter);
 
 // Application Routes
 app.use("/health", healthRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/auth",authLimiter ,authRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/contributors", contributorsRoutes);
 app.use("/api/projects", projectsRoutes);
