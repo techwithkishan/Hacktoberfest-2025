@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Light/Dark Mode Toggle</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+    }
+
+    body.dark {
+      --bg-color: #121212;
+      --text-color: #ffffff;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Light / Dark Mode Toggle 🌗</h1>
+  <button id="toggle-theme">Toggle Theme</button>
+
+  <script>
+    const body = document.body;
+    const toggleBtn = document.getElementById("toggle-theme");
+
+    // Load saved theme from localStorage
+    if (localStorage.getItem("theme") === "dark") {
+      body.classList.add("dark");
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      body.classList.toggle("dark");
+      const currentTheme = body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("theme", currentTheme);
+    });
+  </script>
+</body>
+</html>
