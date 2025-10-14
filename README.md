@@ -147,6 +147,25 @@ npm run test:coverage
 - [Deployment Guide](docs/deployment.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 
+### 📊 New: Python Data Visualization Examples
+
+A new script `python/data_visualization_examples.py` showcases multiple common chart types using Matplotlib & Seaborn (line, bar, histogram/KDE, scatter with regression, box + violin, heatmap, pair plot, donut/pie). It auto‑generates a synthetic dataset so you can explore quickly.
+
+Quick start:
+
+```bash
+pip install -r python/requirements-data-viz.txt
+python -m python.data_visualization_examples --all --no-show
+```
+
+Generate only selected plots and change style/output:
+
+```bash
+python -m python.data_visualization_examples --plots line scatter heatmap --style darkgrid --out viz_results --dpi 150
+```
+
+Outputs are saved (default: `viz_outputs/`). Use `--help` for all options. Contributions adding real dataset examples (e.g., CSV loading) are welcome—open an issue first to discuss!
+
 ## 🌍 Community
 
 - 💬 [Discussions](https://github.com/hari7261/Hacktoberfest-2025/discussions)
