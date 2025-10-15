@@ -1,0 +1,194 @@
+import javafx.application.Application;
+import javafx.collections.*;
+import javafx.geometry.*;
+import javafx.scene.Scene;
+import javafx.scene.chart.*;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.util.*;
+
+public class HabitTrackerApp extends Application {
+
+    // Observable list for habits
+    private ObservableList<Habit> habitList = FXCollections.observableArrayList();
+    private TableView<Habit> table = new TableView<>();
+
+    // JSON storage file
+    private final String DATA_FILE = "habits.json";
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Smart Habit & Productivity Tracker");
+
+        // Load habits from file
+        loadHabits();
+
+        // --- Layout ---
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(10));
+
+        // Header
+        Label header = new Label("Habit Tracker Dashboard");
+        header.setFont(Font.font(24));
+        root.setTop(header);
+        BorderPane.setAlignment(header, Pos.CENTER);
+
+        // Table
+        TableColumn<Habit, String> nameCol = new TableColumn<>("Habit");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setPrefWidth(200);
+
+        TableColumn<Habit, String> freqCol = new TableColumn<>("Frequency");
+        freqCol.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+
+        TableColumn<Habit, Integer> streakCol = new TableColumn<>("Streak");
+        streakCol.setCellValueFactory(new PropertyValueFactory<>("streak"));
+
+        TableColumn<Habit, LocalDate> lastCol = new TableColumn<>("Last Done");
+        lastCol.setCellValueFactory(new PropertyValueFactory<>("lastDone"));
+
+        TableColumn<Habit, Void> actionCol = new TableColumn<>("Action");
+        actionCol.setCellFactory(getButtonCellFactory());
+
+        table.getColumns().addAll(nameCol, freqCol, streakCol, lastCol, actionCol);
+        table.setItems(habitList);
+
+        // Add habit form
+        TextField nameInput = new TextField();
+        nameInput.setPromptText("Habit name");
+
+        ComboBox<String> freqInput = new ComboBox<>();
+        freqInput.getItems().addAll("Daily", "Weekly");
+        freqInput.setValue("Daily");
+
+        Button addBtn = new Button("Add Habit");
+        addBtn.setOnAction(e -> {
+            String name = nameInput.getText().trim();
+            String freq = freqInput.getValue();
+            if (!name.isEmpty()) {
+                Habit h = new Habit(name, freq, 0, null);
+                habitList.add(h);
+                nameInput.clear();
+                saveHabits();
+                renderChart(root);
+            }
+        });
+
+        HBox form = new HBox(10, nameInput, freqInput, addBtn);
+        form.setPadding(new Insets(10));
+
+        VBox leftPanel = new VBox(10, table, form);
+        root.setLeft(leftPanel);
+
+        renderChart(root);
+
+        Scene scene = new Scene(root, 900, 500);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    // --- Button cell factory for table actions ---
+    private Callback<TableColumn<Habit, Void>, TableCell<Habit, Void>> getButtonCellFactory() {
+        return new Callback<>() {
+            @Override
+            public TableCell<Habit, Void> call(final TableColumn<Habit, Void> param) {
+                return new TableCell<>() {
+                    private final Button doneBtn = new Button("✔ Done");
+                    private final Button delBtn = new Button("🗑 Delete");
+                    {
+                        doneBtn.setOnAction(e -> {
+                            Habit h = getTableView().getItems().get(getIndex());
+                            h.setLastDone(LocalDate.now());
+                            h.setStreak(h.getStreak() + 1);
+                            table.refresh();
+                            saveHabits();
+                        });
+                        delBtn.setOnAction(e -> {
+                            Habit h = getTableView().getItems().get(getIndex());
+                            habitList.remove(h);
+                            saveHabits();
+                            renderChart((BorderPane) getScene().getRoot());
+                        });
+                    }
+                    HBox pane = new HBox(5, doneBtn, delBtn);
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(pane);
+                        }
+                    }
+                };
+            }
+        };
+    }
+
+    // --- Render Pie Chart ---
+    private void renderChart(BorderPane root) {
+        PieChart pieChart = new PieChart();
+        Map<String, Long> freqMap = new HashMap<>();
+        for (Habit h : habitList) {
+            freqMap.put(h.getName(), (long) h.getStreak());
+        }
+        freqMap.forEach((k, v) -> {
+            PieChart.Data slice = new PieChart.Data(k + " (" + v + ")", v);
+            pieChart.getData().add(slice);
+        });
+        VBox chartPanel = new VBox(new Label("Habit Completion Chart"), pieChart);
+        chartPanel.setPadding(new Insets(10));
+        root.setCenter(chartPanel);
+    }
+
+    // --- JSON Persistence ---
+    private void saveHabits() {
+        try (Writer writer = new FileWriter(DATA_FILE)) {
+            Gson gson = new Gson();
+            gson.toJson(new ArrayList<>(habitList), writer);
+        } catch (IOException e) { e.printStackTrace(); }
+    }
+
+    private void loadHabits() {
+        File f = new File(DATA_FILE);
+        if (!f.exists()) return;
+        try (Reader reader = new FileReader(DATA_FILE)) {
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<Habit>>(){}.getType();
+            List<Habit> list = gson.fromJson(reader, listType);
+            habitList.addAll(list);
+        } catch (IOException e) { e.printStackTrace(); }
+    }
+
+    // --- Habit Class ---
+    public static class Habit {
+        private String name;
+        private String frequency;
+        private int streak;
+        private LocalDate lastDone;
+
+        public Habit(String name, String frequency, int streak, LocalDate lastDone){
+            this.name=name; this.frequency=frequency; this.streak=streak; this.lastDone=lastDone;
+        }
+        public String getName(){return name;}
+        public String getFrequency(){return frequency;}
+        public int getStreak(){return streak;}
+        public LocalDate getLastDone(){return lastDone;}
+        public void setLastDone(LocalDate d){lastDone=d;}
+        public void setStreak(int s){streak=s;}
+    }
+}

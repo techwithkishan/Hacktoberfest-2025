@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Layout */
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f4e4ba, #f7d9e3);
+    padding: 16px;
+}
+
+/* Card Container */
+.container {
+    background: #fff;
+    width: min(420px, 92vw);
+    padding: 28px 24px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+}
+
+/* Headings */
+h2 {
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 1.6rem;
+    color: #333;
+    letter-spacing: 0.5px;
+}
+
+/* Form */
+form {
+    margin: 20px 0 12px 0;
+}
+
+form select, form button, form input {
+    width: 100%;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+}
+
+/* Input */
+form input {
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    height: 48px;
+    padding: 0 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+form input:focus {
+    border-color: #af4d98;
+    box-shadow: 0 0 0 3px rgba(175, 77, 152, 0.15);
+}
+
+/* Dropdowns */
+.dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.dropdown i {
+    font-size: 22px;
+    color: #af4d98;
+    margin-top: 10px;
+}
+
+/* Select Box */
+.select-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 9rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    background: #fafafa;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.select-container:hover {
+    border-color: #af4d98;
+    box-shadow: 0 0 6px rgba(175, 77, 152, 0.2);
+}
+.select-container img {
+    max-width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.select-container select {
+    font-size: 1rem;
+    width: auto;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Message */
+.msg {
+    margin: 20px 0;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #444;
+}
+
+/* Button */
+form button {
+    height: 50px;
+    background: linear-gradient(135deg, #af4d98, #d16ba5);
+    color: #fff;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+form button:hover {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+}
+
+/* Small screens */
+@media (max-width: 500px) {
+    .dropdown {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .select-container {
+        width: 100%;
+    }
+}

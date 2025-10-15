@@ -1,0 +1,43 @@
+---
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature] Brief description of the feature"
+labels: ["enhancement", "feature-request"]
+assignees: []
+---
+
+## ✨ Feature Request
+
+### Is your feature request related to a problem? Please describe.
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+### Describe the solution you'd like
+A clear and concise description of what you want to happen.
+
+### Describe alternatives you've considered
+A clear and concise description of any alternative solutions or features you've considered.
+
+### Additional Context
+Add any other context or screenshots about the feature request here.
+
+### Implementation Details (Optional)
+If you have thoughts on how this could be implemented:
+- **Frontend Changes**: Describe any UI/UX changes needed
+- **Backend Changes**: Describe any API or server-side changes needed
+- **Database Changes**: Describe any data model changes needed
+- **Testing**: Describe what tests would be needed
+
+### Priority Level
+- [ ] Low - Nice to have
+- [ ] Medium - Would be helpful
+- [ ] High - Important for the project
+- [ ] Critical - Must have
+
+### Checklist
+- [ ] I have searched for similar feature requests before creating this one
+- [ ] I have provided all the information requested above
+- [ ] I have read the [Contributing Guidelines](https://github.com/hari7261/Hacktoberfest-2025/blob/main/CONTRIBUTING.md)
+
+---
+
+**Thank you for your feature suggestion! We appreciate your input in making our project better. 🎃**
