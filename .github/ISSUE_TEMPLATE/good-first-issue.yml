@@ -1,0 +1,68 @@
+---
+name: 🎓 Good First Issue
+description: Perfect for newcomers to open source and Hacktoberfest
+title: "[Beginner] Brief description of the task"
+labels: ["good first issue", "hacktoberfest", "beginner-friendly"]
+assignees: []
+---
+
+## 🎓 Good First Issue - Perfect for Hacktoberfest!
+
+This issue is designed for developers who are new to open source or looking to make their first Hacktoberfest contribution. We'll provide clear guidance and support throughout the process.
+
+### 📋 Task Description
+[Provide a clear, step-by-step description of what needs to be done]
+
+### 🎯 Learning Objectives
+By completing this task, you'll learn:
+- [List 2-3 specific skills or concepts the contributor will learn]
+
+### 📁 Files to Work With
+```
+[List the specific files that need to be modified]
+- file1.js - Description of what to change
+- file2.md - Description of what to change
+```
+
+### ✅ Acceptance Criteria
+- [ ] Code follows our [contributing guidelines](https://github.com/hari7261/Hacktoberfest-2025/blob/main/CONTRIBUTING.md)
+- [ ] All tests pass (if applicable)
+- [ ] Code is properly formatted
+- [ ] Documentation is updated (if needed)
+
+### 🚀 Steps to Complete
+1. **Fork** this repository
+2. **Clone** your fork locally
+3. **Create** a new branch: `git checkout -b fix/[brief-description]`
+4. **Make** your changes following the guidelines below
+5. **Test** your changes
+6. **Commit** with a clear message: `git commit -m "feat: [brief description]"`
+7. **Push** to your fork: `git push origin [your-branch-name]`
+8. **Create** a Pull Request
+
+### 💡 Hints and Tips
+[Provide specific guidance, code snippets, or resources that will help the contributor]
+
+### 🧪 Testing Your Changes
+```bash
+# Commands to run tests or verify your changes
+npm run test
+npm run lint
+```
+
+### 📚 Resources
+- [Contributing Guide](https://github.com/hari7261/Hacktoberfest-2025/blob/main/CONTRIBUTING.md)
+- [Project Documentation](https://github.com/hari7261/Hacktoberfest-2025/tree/main/docs)
+- [Ask for Help](https://github.com/hari7261/Hacktoberfest-2025/discussions)
+
+### 🏷️ Labels
+This issue is labeled as:
+- `good first issue` - Perfect for beginners
+- `hacktoberfest` - Counts toward Hacktoberfest
+- `beginner-friendly` - Clear instructions provided
+
+---
+
+**Need help?** Don't hesitate to ask questions in the comments or our [Discussions](https://github.com/hari7261/Hacktoberfest-2025/discussions) section!
+
+**Happy Hacking! 🎃**

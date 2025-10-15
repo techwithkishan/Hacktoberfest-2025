@@ -1,0 +1,59 @@
+## 🎃 Hacktoberfest 2025 Pull Request
+
+Thank you for contributing to our Hacktoberfest 2025 project! 🎉
+
+### 📝 Description
+[Brief description of the changes you made]
+
+### 🔧 Changes Made
+- [ ] **Type of change:**
+  - [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+  - [ ] ✨ New feature (non-breaking change which adds functionality)
+  - [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
+  - [ ] 📚 Documentation update
+  - [ ] 🎨 Style/UI update
+  - [ ] 🧪 Tests added/updated
+  - [ ] 🔧 Maintenance/refactor
+
+### ✅ Checklist
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published in downstream modules
+
+### 🧪 Testing
+- [ ] I have tested these changes locally
+- [ ] All existing tests pass
+- [ ] I have added new tests for new features
+- [ ] Tests cover both happy path and edge cases
+
+### 📸 Screenshots (if applicable)
+[Add screenshots of your changes here]
+
+### 🔗 Related Issues
+Closes #[issue_number]
+
+### 📚 Additional Notes
+[Any additional information or context about this PR]
+
+---
+
+## 🎖️ Hacktoberfest Participation
+
+By submitting this PR, I confirm that:
+- [ ] This contribution is meaningful and adds value to the project
+- [ ] I have read and followed the [Contributing Guidelines](https://github.com/hari7261/Hacktoberfest-2025/blob/main/CONTRIBUTING.md)
+- [ ] I have read and agree to abide by the [Code of Conduct](https://github.com/hari7261/Hacktoberfest-2025/blob/main/CODE_OF_CONDUCT.md)
+- [ ] This PR is not spam and represents genuine contribution effort
+
+**Hacktoberfest Badge Eligibility:** This PR should qualify for Hacktoberfest 2025! 🎁
+
+---
+
+**Thank you for your contribution! We appreciate your help in making this project better.** 🌟
+
+*This PR template is part of our Hacktoberfest 2025 initiative to make contributing easier and more structured.*

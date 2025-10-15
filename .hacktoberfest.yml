@@ -1,0 +1,118 @@
+# 🎃 Hacktoberfest 2025 Configuration
+
+# This file configures your repository for Hacktoberfest 2025
+# Learn more: https://hacktoberfest.com/participation/
+
+# Repository topics (add these to your repo settings)
+topics:
+  - hacktoberfest
+  - hacktoberfest-2025
+  - open-source
+  - javascript
+  - typescript
+  - react
+  - node-js
+  - web-development
+
+# Minimum PR requirements for Hacktoberfest
+min_prs: 4
+max_prs: 1000
+
+# Languages supported (for contributor diversity)
+languages:
+  - javascript
+  - typescript
+  - python
+  - java
+  - go
+  - rust
+  - html
+  - css
+  - markdown
+
+# Difficulty levels for issues
+difficulty_levels:
+  - beginner
+  - intermediate
+  - advanced
+
+# Required labels for Hacktoberfest PRs
+required_labels:
+  - hacktoberfest-accepted
+
+# Optional labels that help with organization
+optional_labels:
+  - good first issue
+  - help wanted
+  - documentation
+  - bug
+  - enhancement
+  - question
+
+# Contribution types that count for Hacktoberfest
+contribution_types:
+  - code
+  - documentation
+  - design
+  - bug_reports
+  - feature_requests
+  - tutorials
+  - translations
+
+# Quality guidelines
+quality_checks:
+  - linting_passes
+  - tests_pass
+  - documentation_updated
+  - code_review_approved
+  - meaningful_contribution
+
+# Community guidelines
+community:
+  - inclusive
+  - welcoming
+  - respectful
+  - collaborative
+  - educational
+
+# Digital Ocean requirements compliance
+digital_ocean_compliance:
+  - spam_free: true
+  - quality_contributions: true
+  - proper_labeling: true
+  - maintainer_oversight: true
+  - community_focused: true
+
+# Holopin integration
+holopin:
+  enabled: true
+  badges:
+    - first-contribution
+    - quality-contributor
+    - project-supporter
+    - hacktoberfest-2025-special
+
+# Automated checks
+automated_checks:
+  - ci_cd_pipeline
+  - security_scanning
+  - code_quality
+  - test_coverage
+  - dependency_updates
+
+# Mentor availability
+mentorship:
+  available: true
+  channels:
+    - github_discussions
+    - issues
+    - discord
+    - slack
+
+# Success metrics (for tracking)
+metrics:
+  - total_contributors
+  - prs_merged
+  - issues_resolved
+  - community_growth
+  - code_quality_improvements
