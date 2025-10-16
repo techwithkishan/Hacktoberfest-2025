@@ -170,7 +170,6 @@ Outputs are saved (default: `viz_outputs/`). Use `--help` for all options. Contr
 
 - 💬 [Discussions](https://github.com/hari7261/Hacktoberfest-2025/discussions)
 - 🐛 [Issues](https://github.com/hari7261/Hacktoberfest-2025/issues)
-- 📧 [Email](mailto:your-email@example.com)
 
 ## 🎉 Contributors
 
