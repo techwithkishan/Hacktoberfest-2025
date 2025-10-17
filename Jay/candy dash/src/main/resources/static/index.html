@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Candy Dash</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="game-wrap">
+    <header>
+      <h1>Candy Dash</h1>
+      <div class="hud">
+        <span id="score">Score: 0</span>
+        <button id="startBtn">Start</button>
+      </div>
+    </header>
+
+    <canvas id="gameCanvas" width="500" height="600"></canvas>
+
+    <aside id="highscores">
+      <h3>High Scores</h3>
+      <ol id="scoresList"></ol>
+    </aside>
+
+    <div id="game-over" class="hidden">
+      <h2>Game Over</h2>
+      <p>Your score: <span id="finalScore">0</span></p>
+      <input id="playerName" placeholder="Your name" maxlength="20"/>
+      <button id="submitScore">Submit Score</button>
+      <button id="playAgain">Play Again</button>
+    </div>
+  </div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const WIDTH = canvas.width, HEIGHT = canvas.height;
+let animId, gameRunning=false, score=0;
+const basket = { x: WIDTH/2 - 50, y: HEIGHT-60, w: 100, h: 30, speed: 6 };
+const candies = [];
+const candyTypes = [
+  { color: '#ff5c8a', points: 10 },
+  { color: '#ffd166', points: 15 },
+  { color: '#06d6a0', points: 20 },
+  { color: '#4d6cff', points: -10 }
+];
+let spawnInterval = 900, lastSpawn = 0, keys = {};
+
+document.addEventListener('keydown', e => keys[e.key] = true);
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+function resetGame() {
+  score = 0;
+  candies.length = 0;
+  basket.x = WIDTH/2 - basket.w/2;
+  spawnInterval = 900;
+  document.getElementById('score').textContent = 'Score: 0';
+  hideGameOver();
+}
+function startGame() {
+  resetGame();
+  gameRunning = true;
+  lastSpawn = performance.now();
+  animId = requestAnimationFrame(loop);
+}
+function endGame() {
+  gameRunning = false;
+  cancelAnimationFrame(animId);
+  document.getElementById('finalScore').textContent = score;
+  showGameOver();
+  fetchHighScores();
+}
+function spawnCandy() {
+  const t = candyTypes[Math.floor(Math.random()*candyTypes.length)];
+  const size = 18 + Math.random()*14;
+  const x = Math.random()*(WIDTH - size);
+  const speed = 1.2 + Math.random()*2.4 + (score/200);
+  candies.push({ x, y: -size, r: size/2, color: t.color, points: t.points, speed });
+}
+function loop(ts) {
+  if (!gameRunning) return;
+  if (ts - lastSpawn > spawnInterval) {
+    spawnCandy();
+    lastSpawn = ts;
+    if (spawnInterval > 350) spawnInterval -= 8;
+  }
+  update(); draw();
+  animId = requestAnimationFrame(loop);
+}
+function update() {
+  if (keys['ArrowLeft'] || keys['a']) basket.x -= basket.speed;
+  if (keys['ArrowRight'] || keys['d']) basket.x += basket.speed;
+  basket.x = Math.max(0, Math.min(WIDTH - basket.w, basket.x));
+  for (let i = candies.length -1; i >=0; i--) {
+    const c = candies[i];
+    c.y += c.speed;
+    if (c.y + c.r*2 >= basket.y &&
+        c.x + c.r*2 > basket.x &&
+        c.x < basket.x + basket.w) {
+      score += c.points;
+      if (score < 0) score = 0;
+      document.getElementById('score').textContent = 'Score: ' + score;
+      candies.splice(i,1);
+      continue;
+    }
+    if (c.y - c.r > HEIGHT) {
+      if (c.points > 0) {
+        endGame(); return;
+      } else candies.splice(i,1);
+    }
+  }
+  if (score >= 500) endGame();
+}
+function draw() {
+  ctx.clearRect(0,0,WIDTH,HEIGHT);
+  ctx.fillStyle = '#f9f3ff'; ctx.fillRect(0,0,WIDTH,HEIGHT);
+  for (const c of candies) {
+    ctx.beginPath();
+    ctx.fillStyle = c.color;
+    ctx.arc(c.x + c.r, c.y + c.r, c.r, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#7c3aed';
+  ctx.fillRect(basket.x, basket.y, basket.w, basket.h);
+}
+function showGameOver(){document.getElementById('game-over').classList.remove('hidden');}
+function hideGameOver(){document.getElementById('game-over').classList.add('hidden');}
+async function submitScore(name, points){
+  await fetch('/api/scores',{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({name,points})});
+  await fetchHighScores();
+}
+async function fetchHighScores(){
+  const res=await fetch('/api/scores?limit=10');
+  const list=await res.json();
+  const ol=document.getElementById('scoresList');
+  ol.innerHTML='';
+  for(const s of list){
+    const li=document.createElement('li');
+    li.textContent=`${s.name} — ${s.points}`;
+    ol.appendChild(li);
+  }
+}
+document.getElementById('startBtn').addEventListener('click',()=>startGame());
+document.getElementById('playAgain').addEventListener('click',()=>startGame());
+document.getElementById('submitScore').addEventListener('click',async()=>{
+  const name=document.getElementById('playerName').value.trim()||'Anonymous';
+  await submitScore(name,score);
+  hideGameOver();
+});
+fetchHighScores();
+</script>
+</body>
+</html>
