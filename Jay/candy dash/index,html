@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candy Dash: Sweet Adventure</title>
+    <style>
+        /* Core Reset and Body Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Comic Sans MS', cursive; /* Playful, candy-like font */
+            background: linear-gradient(135deg, #ff69b4 0%, #ffd700 50%, #ff1493 100%); /* Pink-gold gradient for sugary vibe */
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; /* 3D depth for realism */
+        }
+
+        /* Game Container: Candy wrapper frame with shine */
+        .game-container {
+            position: relative;
+            width: 90vw;
+            height: 90vh;
+            max-width: 800px;
+            max-height: 600px;
+            border: 5px solid #ffd700;
+            border-radius: 20px;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.5), /* Golden glow */
+                inset 0 0 20px rgba(255, 255, 255, 0.2), /* Inner shine */
+                0 10px 20px rgba(0, 0, 0, 0.3); /* 3D shadow for realism */
+            background: 
+                linear-gradient(45deg, #fff 25%, transparent 25%), /* Candy stripe pattern */
+                linear-gradient(-45deg, #fff 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #fff 75%),
+                linear-gradient(-45deg, transparent 75%, #fff 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            overflow: hidden;
+        }
+
+        /* Canvas: The dash world */
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer; /* Hand for jump on click */
+            filter: saturate(1.2) brightness(1.1); /* Vibrant, glossy look */
+        }
+
+        /* HUD: Candy-themed overlay */
+        .hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-top {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .hud-bottom {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: center;
+            font-size: 14px;
+            text-shadow: 0 0 5px #ff69b4;
+        }
+
+        /* Lives: Animated candy hearts */
+        .lives {
+            display: flex;
+            gap: 5px;
+        }
+        .life {
+            width: 20px;
+            height: 20px;
+            background: #ff69b4;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Heart shape */
+            box-shadow: 0 0 10px #ff69b4;
+            animation: heartbeat 1s infinite;
+        }
+        .life.lost {
+            opacity: 0.3;
+            animation: none;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Score: Glowing candy counter */
+        .score {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Level Indicator: Wobbling candy bar */
+        .level {
+            background: linear-gradient(#8b4513, #a0522d); /* Chocolate bar */
+            padding: 5px 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+            animation: wobble 2s infinite;
+        }
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
+        /* Instructions: Floating bubble text */
+        .instructions {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px); /* Glassy realism */
+        }
+
+        /* Game Over/Win Screen: Candy explosion overlay */
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 20;
+            font-size: 28px;
+            text-shadow: 0 0 15px #ffd700;
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(#ff69b4, #ff1493);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+            transition: transform 0.2s;
+        }
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Parallax Background Layers (CSS for distant elements) */
+        .parallax {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .layer1 { /* Clouds */
+            background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.3) 0px, rgba(255, 255, 255, 0.3) 20px, transparent 20px, transparent 40px);
+            animation: float 20s linear infinite;
+        }
+        .layer2 { /* Candy canes */
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ff0000"/><path d="M50 10 Q70 30 50 50 Q30 70 50 90" stroke="%23fff" stroke-width="5" fill="none"/></svg>') repeat;
+            opacity: 0.5;
+            animation: scroll 30s linear infinite;
+        }
+        @keyframes float {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50px); }
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Particle Effect on Collect (CSS for candies) */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: burst 1s ease-out forwards;
+        }
+        @keyframes burst {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1) rotate(360deg) translateY(-50px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="parallax layer1" id="clouds"></div>
+        <div class="parallax layer2" id="candies"></div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="hud">
+            <div class="hud-top">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="level">Level: <span id="level">1</span></div>
+            </div>
+            <div class="hud-bottom">
+                <div class="lives" id="lives"></div>
+            </div>
+            <div class="instructions">Press SPACE or Tap to Jump! Collect Candies!</div>
+        </div>
+        <div class="game-over" id="gameOver">
+            <div id="gameOverText">Game Over!</div>
+            <button class="restart-btn" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game Variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameOverEl = document.getElementById('gameOver');
+        const gameOverText = document.getElementById('gameOverText');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const livesEl = document.getElementById('lives');
+
+        // Responsive Canvas
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Game State
+        let player = { x: 100, y: canvas.height - 100, vy: 0, jumping: false, size: 30, color: '#ff69b4' };
+        let obstacles = [];
+        let candies = [];
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let gameSpeed = 2;
+        let gameRunning = true;
+        let groundY = canvas.height - 50;
+        let gravity = 0.8;
+        let jumpPower = -15;
+        let levelLength = 2000; // Pixels to complete level
+        let distanceTraveled = 0;
+        let keys = {};
+        let touchStartY = 0;
+
+        // Level Configs (Unique themes via speed/obstacles)
+        const levels = [
+            { speed: 2, obstacleDensity: 0.02, bgColor: '#ffb6c1', name: 'Candy Meadow' },
+            { speed: 3, obstacleDensity: 0.03, bgColor: '#8b4513', name: 'Chocolate River' },
+            { speed: 4, obstacleDensity: 0.04, bgColor: '#90ee90', name: 'Gummy Hills' },
+            { speed: 5, obstacleDensity: 0.05, bgColor: '#4b0082', name: 'Licorice Forest' },
+            { speed: 6, obstacleDensity: 0.06, bgColor: '#ffd700', name: 'Ultimate Rush' }
+        ];
+
+        // Initialize Game
+        function initGame() {
+            resizeCanvas();
+            player.y = groundY - player.size;
+            obstacles = [];
+            candies = [];
+            score = 0;
+            level = 1;
+            lives = 3;
+            gameSpeed = levels[0].speed;
+            distanceTraveled = 0;
+            gameRunning = true;
+            gameOverEl.style.display = 'none';
+            updateUI();
+            generateLives();
+            // Parallax setup
+            document.getElementById('clouds').style.backgroundColor = levels[0].bgColor;
+        }
+
+        // Generate Lives UI
+        function generateLives() {
+            livesEl.innerHTML = '';
+            for (let i = 0; i < lives; i++) {
+                const life = document.createElement('div');
+                life.classList.add('life');
+                livesEl.appendChild(life);
+            }
+        }
+
+        // Input Handling
+        window.addEventListener('keydown', (e) => { 
+            keys[e.code] = true; 
+            if (e.code === 'Space' && !player.jumping) jump();
+        });
+        window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            jump();
+        });
+        canvas.addEventListener('click', jump);
+
+        function jump() {
+            if (!gameRunning || player.jumping) return;
+            player.vy = jumpPower;
+            player.jumping = true;
+            // Bounce animation (CSS class on player if needed, but handled in render)
+        }
+
+        // Update Player Physics
+        function updatePlayer() {
+            if (!gameRunning) return;
+            player.vy += gravity;
+            player.y += player.vy;
+            if (player.y >= groundY - player.size) {
+                player.y = groundY - player.size;
+                player.vy = 0;
+                player.jumping = false;
+            }
+        }
+
+        // Generate Obstacles and Candies
+        function generateItems() {
+            if (Math.random() < levels[level - 1].obstacleDensity) {
+                obstacles.push({
+                    x: canvas.width,
+                    y: groundY - Math.random() * 50 - 20,
+                    width: 30,
+                    height: 40 + Math.random() * 20,
+                    color: '#8b4513' // Brown chocolate
+                });
+            }
+            if (Math.random() < 0.05) {
+                candies.push({
+                    x: canvas.width,
+                    y: groundY - Math.random() * 100 - 20,
+                    size: 15,
+                    color: '#ffd700',
+                    collected: false
+                });
+            }
+        }
+
+        // Update Obstacles and Candies
+        function updateItems() {
+            // Move obstacles
+            obstacles.forEach((obs, index) => {
+                obs.x -= gameSpeed;
+                if (obs.x + obs.width < 0) obstacles.splice(index, 1);
+                // Collision with player
+                if (obs.x < player.x + player.size && obs.x + obs.width > player.x &&
+                    player.y < obs.y + obs.height && player.y + player.size > obs.y) {
+                    lives--;
+                    generateLives();
+                    obstacles.splice(index, 1);
+                    if (lives <= 0) gameOver('Oh no! You ran out of lives! Sweet dreams...');
+                }
+            });
+
+            // Move candies
+            candies.forEach((candy, index) => {
+                candy.x -= gameSpeed;
+                if (candy.x + candy.size < 0) candies.splice(index, 1);
+                // Collision with player
+                if (!candy.collected && candy.x < player.x + player.size && candy.x + candy.size > player.x &&
+                    player.y < candy.y + candy.size && player.y + player.size > candy.y) {
+                    score += 10;
+                    candy.collected = true;
+                    candies.splice(index, 1);
+                    createParticles(candy.x, candy.y);
+                    if (score >= 100 * level) completeLevel();
+                }
+            });
+        }
+
+        // Create Particle Burst (CSS-based)
+        function createParticles(x, y) {
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left
