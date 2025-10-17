@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"pages\\\\social-media.tsx -> ../components/SocialMediaDashboard/SocialMediaDashboard\":{\"id\":\"pages\\\\social-media.tsx -> ../components/SocialMediaDashboard/SocialMediaDashboard\",\"files\":[\"static/chunks/src_components_SocialMediaDashboard_SocialMediaDashboard_tsx.js\"]}}"

@@ -1,0 +1,132 @@
+/* ===== CANDY DASH - NEON CANDY THEME ===== */
+body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at top, #ffafbd, #ffc3a0, #ff9a9e);
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* GAME CONTAINER */
+#game-container {
+  background: linear-gradient(135deg, #ff6a88, #ff99ac, #f78ca0);
+  border-radius: 25px;
+  box-shadow: 0 0 30px rgba(255, 170, 200, 0.7), inset 0 0 10px #fff;
+  width: 700px;
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  animation: pulse 3s infinite alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: 0 0 20px #ff9aa2; }
+  to { box-shadow: 0 0 40px #ffb6c1; }
+}
+
+/* HEADER */
+header {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 10px #ffb6c1, 0 0 20px #ff69b4;
+  margin-bottom: 20px;
+}
+
+/* SCORE DISPLAY */
+#score-board {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 1.2rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 8px 15px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 10px rgba(255, 182, 193, 0.8);
+}
+
+/* PLAYER */
+#player {
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle at top, #ffdde1, #ee9ca7);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 20px #fff, 0 0 40px #ffb6c1;
+  animation: floaty 2s infinite ease-in-out;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+
+/* CANDY OBJECTS */
+.candy {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: absolute;
+  top: -50px;
+  animation: fall 4s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+}
+
+.candy:nth-child(odd) {
+  background: radial-gradient(circle at top, #ffecd2, #fcb69f);
+}
+
+.candy:nth-child(even) {
+  background: radial-gradient(circle at top, #a1c4fd, #c2e9fb);
+}
+
+@keyframes fall {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(550px); opacity: 0.6; }
+}
+
+/* BUTTONS */
+button {
+  background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 12px 35px;
+  cursor: pointer;
+  margin-top: 20px;
+  box-shadow: 0 0 15px #ff9aa2, 0 0 30px #ffb6c1;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #ff85a1, #ff4e88);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px #ffb6c1, 0 0 60px #ff85a1;
+}
+
+/* GAME OVER MESSAGE */
+#game-over {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 2.5rem;
+  text-shadow: 0 0 20px #fff, 0 0 40px #ff69b4;
+  display: none;
+}

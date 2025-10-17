@@ -1,42 +1,26 @@
-
-import type { NextPage } from 'next';
+﻿import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
-import dynamic from 'next/dynamic';
 
-const HacktoberfestDashboard = dynamic(() => import('../components/HacktoberfestDashboard'), {
-  ssr: false,
-  loading: () => <p>Loading dashboard...</p>,
-});
-
-const Home: NextPage = () => {
-  const title = 'Hacktoberfest 2025 - Join the Open Source Celebration';
-  const description =
-    'Join Hacktoberfest 2025 and contribute to open source projects. Win swag, learn new skills, and connect with the global developer community.';
-  const keywords =
-    'hacktoberfest, open source, github, pull requests, developers, coding, programming';
-  const url = 'https://github.com/hari7261/Hacktoberfest-2025';
-  const image = 'https://yourdomain.com/og-image.png'; 
+export default function Home() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    router.push('/social-media');
+  }, [router]);
 
   return (
     <>
       <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta name="keywords" content={keywords} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={url} />
-        <meta property="og:image" content={image} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Social Media Analytics Dashboard</title>
+        <meta name="description" content="Track and analyze your social media performance" />
       </Head>
-      <HacktoberfestDashboard />
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">Redirecting to Social Media Dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        </div>
+      </div>
     </>
   );
-};
-
-export default Home;
+}

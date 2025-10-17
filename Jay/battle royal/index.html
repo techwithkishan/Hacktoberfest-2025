@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battle Royale Cartoon</title>
+<style>
+    body {
+        margin:0; padding:0; overflow:hidden;
+        background: linear-gradient(135deg, #2c1810 0%, #1a0f0b 100%);
+        font-family: 'Courier New', monospace;
+        color: #00ff00;
+    }
+    .game-container {
+        position: relative; width: 100vw; height: 100vh; overflow:hidden;
+    }
+    #gameCanvas { display:block; width:100%; height:100%; background:rgba(0,0,0,0.1);}
+    .hud {
+        position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;
+    }
+    .hud-top, .hud-bottom {
+        display:flex; justify-content:space-between; width:95%; margin:5px auto;
+        font-size:14px; text-shadow:0 0 5px #00ff00;
+    }
+    .health-bar { width:200px; height:20px; background:#333; border:2px solid #00ff00; border-radius:10px; overflow:hidden; }
+    .health-fill { height:100%; background:linear-gradient(90deg,#ff0000,#00ff00); transition:0.3s; }
+    .zone-indicator { position:absolute; top:50%; left:50%; width:100px; height:100px; margin:-50px 0 0 -50px; border:2px dashed #00aaff; border-radius:50%; pointer-events:none; opacity:0.7; animation:pulse 2s infinite;}
+    @keyframes pulse {0%{box-shadow:0 0 0 0 rgba(0,170,255,0.7);}70%{box-shadow:0 0 0 20px rgba(0,170,255,0);}100%{box-shadow:0 0 0 0 rgba(0,170,255,0);}}
+    .game-over { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; flex-direction:column; font-size:24px; text-shadow:0 0 10px #ff0000; display:none; z-index:20; }
+    .restart-btn { margin-top:20px; padding:10px 20px; background:#333; border:2px solid #00ff00; color:#00ff00; cursor:pointer; }
+    .restart-btn:hover { box-shadow:0 0 10px #00ff00; }
+</style>
+</head>
+<body>
+<div class="game-container">
+    <canvas id="gameCanvas"></canvas>
+    <div class="hud">
+        <div class="hud-top">
+            <div>Survivors: <span id="survivors">0</span></div>
+            <div>Level: <span id="level">1</span></div>
+            <div id="score">Score: 0</div>
+        </div>
+        <div class="hud-bottom">
+            <div>Health</div>
+            <div class="health-bar"><div class="health-fill" id="healthFill"></div></div>
+            <div id="weapon">Weapon: Default</div>
+        </div>
+        <div class="zone-indicator" id="zoneIndicator"></div>
+    </div>
+    <div class="game-over" id="gameOver">
+        <div>GAME OVER</div>
+        <button class="restart-btn" onclick="restartGame()">Restart</button>
+    </div>
+</div>
+<script>
+// Canvas & Context
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+
+// HUD Elements
+const healthFill = document.getElementById('healthFill');
+const survivorsEl = document.getElementById('survivors');
+const levelEl = document.getElementById('level');
+const scoreEl = document.getElementById('score');
+const weaponEl = document.getElementById('weapon');
+const zoneIndicator = document.getElementById('zoneIndicator');
+const gameOverEl = document.getElementById('gameOver');
+
+// Game Variables
+let level = 1, score = 0, weaponType = 'Default';
+let keys = {};
+let player = {x:canvas.width/2, y:canvas.height/2, size:64, health:100, speed:4, bullets:[], direction:{x:1,y:0}, weaponLevel:1};
+let enemies = [], pickups = [], zone = {x:canvas.width/2, y:canvas.height/2, radius:Math.min(canvas.width,canvas.height)/2};
+let gameRunning = true;
+
+// Input
+window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key==' ') shoot(); });
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+// Initialize Game
+function initGame(){
+    enemies = []; pickups = [];
+    let totalEnemies = level+2;
+    for(let i=0;i<totalEnemies;i++){
+        let boss = (level%10===0 && i===0);
+        enemies.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:boss?128:64, health:boss?500:50+level*10, speed:boss?1.5:1+Math.random()*level, boss:boss});
+    }
+    for(let i=0;i<5;i++) pickups.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:32, collected:false});
+    player.health=100;
+    gameRunning=true;
+    updateUI();
+}
+
+// Restart & Next Level
+function restartGame(){ level=1; score=0; player.weaponLevel=1; weaponType='Default'; weaponEl.textContent='Weapon: Default'; initGame(); gameOverEl.style.display='none'; }
+function nextLevel(){ level++; if(level%5===0){ player.weaponLevel++; upgradeWeapon(); } initGame(); }
+function upgradeWeapon(){ if(player.weaponLevel==2) weaponType='Rapid-Fire'; else if(player.weaponLevel>=3) weaponType='Rocket'; weaponEl.textContent='Weapon: '+weaponType; }
+
+// Shooting
+function shoot(){ if(player.bullets.length<player.weaponLevel*5){ let dx=player.direction.x*10, dy=player.direction.y*10; player.bullets.push({x:player.x,y:player.y,dx,dy,type:weaponType}); } }
+
+// Player Update
+function updatePlayer(){
+    let moving=false;
+    if(keys['w']||keys['arrowup']){ player.y-=player.speed; player.direction={x:0,y:-1}; moving=true; }
+    if(keys['s']||keys['arrowdown']){ player.y+=player.speed; player.direction={x:0,y:1}; moving=true; }
+    if(keys['a']||keys['arrowleft']){ player.x-=player.speed; player.direction={x:-1,y:0}; moving=true; }
+    if(keys['d']||keys['arrowright']){ player.x+=player.speed; player.direction={x:1,y:0}; moving=true; }
+    player.x = Math.max(player.size/2, Math.min(canvas.width-player.size/2, player.x));
+    player.y = Math.max(player.size/2, Math.min(canvas.height-player.size/2, player.y));
+
+    player.bullets.forEach((b,i)=>{
+        b.x+=b.dx; b.y+=b.dy;
+        if(b.x<0||b.x>canvas.width||b.y<0||b.y>canvas.height) player.bullets.splice(i,1);
+        enemies.forEach((e,j)=>{
+            let dist=Math.hypot(b.x-e.x,b.y-e.y);
+            if(dist<e.size/2){ e.health-=(b.type=='Rocket'?50:20); player.bullets.splice(i,1); score+=10; }
+        });
+    });
+}
+
+// Enemies Update
+function updateEnemies(){
+    enemies.forEach((e,i)=>{
+        if(e.health<=0){ enemies.splice(i,1); score+=50; return; }
+        let dx=player.x-e.x, dy=player.y-e.y, dist=Math.hypot(dx,dy);
+        if(dist>0){ e.x+=dx/dist*e.speed; e.y+=dy/dist*e.speed; }
+        if(dist<player.size/2+e.size/2){ player.health-=(e.boss?1:0.5); e.health-=0.5; }
+    });
+}
+
+// Pickups Update
+function updatePickups(){
+    pickups.forEach((p,i)=>{
+        if(p.collected) return;
+        let dist=Math.hypot(player.x-p.x, player.y-p.y);
+        if(dist<player.size/2+p.size/2){ player.health=Math.min(100,player.health+20); p.collected=true; pickups.splice(i,1); score+=20; }
+    });
+}
+
+// Zone Update
+function updateZone(){ zone.radius-=0.01; if(zone.radius<50) zone.radius=Math.min(canvas.width,canvas.height)/2;
+let dist=Math.hypot(player.x-zone.x,player.y-zone.y); if(dist>zone.radius) player.health-=0.05;
+zoneIndicator.style.width=zone.radius*100/canvas.width+'px'; zoneIndicator.style.height=zone.radius*100/canvas.width+'px';
+zoneIndicator.style.left=(zone.x-zone.radius/2)+'px'; zoneIndicator.style.top=(zone.y-zone.radius/2)+'px'; }
+
+// Render
+function render(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.beginPath(); ctx.arc(zone.x,zone.y,zone.radius,0,Math.PI*2); ctx.strokeStyle='#00aaff'; ctx.lineWidth=3; ctx.globalAlpha=0.3; ctx.stroke(); ctx.globalAlpha=1;
+    pickups.forEach(p=>{ if(!p.collected){ ctx.fillStyle='green'; ctx.beginPath(); ctx.arc(p.x,p.y,p.size/2,0,Math.PI*2); ctx.fill(); } });
+    enemies.forEach(e=>{ ctx.fillStyle=e.boss?'purple':'red'; ctx.fillRect(e.x-e.size/2,e.y-e.size/2,e.size,e.size); });
+    ctx.fillStyle='blue'; ctx.beginPath(); ctx.arc(player.x,player.y,player.size/2,0,Math.PI*2); ctx.fill();
+    player.bullets.forEach(b=>{ ctx.fillStyle=b.type=='Rocket'?'#ff8800':'#ffff00'; ctx.beginPath(); ctx.arc(b.x,b.y,5,0,Math.PI*2); ctx.fill(); });
+}
+
+// UI
+function updateUI(){ healthFill.style.width=player.health+'%'; survivorsEl.textContent=enemies.length; levelEl.textContent=level; scoreEl.textContent='Score: '+score; weaponEl.textContent='Weapon: '+weaponType; }
+
+// Game Loop
+function gameLoop(){ if(!gameRunning) return;
+    updatePlayer(); updateEnemies(); updatePickups(); updateZone(); render(); updateUI();
+    if(player.health<=0){ gameRunning=false; gameOverEl.style.display='flex'; }
+    else if(enemies.length===0){ nextLevel(); }
+    requestAnimationFrame(gameLoop);
+}
+
+// Start Game
+initGame(); gameLoop();
+</script>
+</body>
+</html>
