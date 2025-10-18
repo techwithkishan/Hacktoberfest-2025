@@ -1,3 +1,48 @@
+<div align="center">
+
+# ⚠️ 🚨 IMPORTANT NOTICE 🚨 ⚠️
+
+</div>
+
+<div align="center">
+  
+```diff
+@@                                                                        @@
+@@   ⛔ THIS REPOSITORY IS NO LONGER ACCEPTING CONTRIBUTIONS ⛔          @@
+@@                                                                        @@
+@@   🎉 CONGRATULATIONS TO 60+ CONTRIBUTORS WHO WERE SUCCESSFULLY        @@
+@@      VERIFIED AND MERGED DURING HACKTOBERFEST 2025! 🎉               @@
+@@                                                                        @@
+@@   ⚠️  PLEASE DO NOT:                                                  @@
+@@      • Fork this repository for Hacktoberfest                         @@
+@@      • Create new pull requests                                       @@
+@@      • Request issue assignments                                      @@
+@@                                                                        @@
+@@   ✨ All new PRs and issues will be closed automatically              @@
+@@                                                                        @@
+@@   🔍 Please explore other amazing Hacktoberfest repositories!         @@
+@@      Visit: https://github.com/topics/hacktoberfest                   @@
+@@                                                                        @@
+@@   Thank you for your understanding and happy open source! 🚀          @@
+@@                                                                        @@
+```
+
+</div>
+
+<div align="center">
+
+---
+
+### 🎊 Repository Status: CLOSED FOR NEW CONTRIBUTIONS 🎊
+
+![Status](https://img.shields.io/badge/Status-CLOSED-red?style=for-the-badge&logo=github)
+![Contributions](https://img.shields.io/badge/Successful_Contributors-60+-brightgreen?style=for-the-badge&logo=opensourceinitiative)
+![Hacktoberfest](https://img.shields.io/badge/Hacktoberfest_2025-Completed-orange?style=for-the-badge&logo=hacktoberfest)
+
+---
+
+</div>
+
 # 🎃 Hacktoberfest 2025 - Modern Web Development Project
 
 [![Hacktoberfest 2025](https://img.shields.io/badge/Hacktoberfest-2025-blueviolet)](https://hacktoberfest.com/)
@@ -9,10 +54,22 @@
 
 <img width="1880" height="873" alt="image" src="https://github.com/user-attachments/assets/cd534c8f-9cdd-4b22-80ba-1fc0155e4122" />
 
+---
 
-Welcome to our Hacktoberfest 2025 project! 🚀 This repository is designed to help developers of all skill levels contribute to open source and earn their Hacktoberfest swag while learning modern web development practices.
+## 🎉 Thank You to Our Amazing Contributors!
 
-## 🌟 About This Project
+This repository successfully completed Hacktoberfest 2025 with **60+ verified and merged contributions**! We are incredibly grateful to all the developers who participated and made this project better.
+
+### 🏆 Achievement Unlocked
+- ✅ 60+ successful contributions
+- ✅ Merged pull requests from talented developers worldwide
+- ✅ Hacktoberfest 2025 participation completed
+
+> **Note:** This repository is now archived for new Hacktoberfest contributions. The code remains available for learning and reference purposes.
+
+---
+
+## 🌟 About This Project (Archive)
 
 This is a modern, full-stack web application that demonstrates best practices in:
 - **Frontend**: React/Next.js with TypeScript
@@ -22,24 +79,39 @@ This is a modern, full-stack web application that demonstrates best practices in
 - **Testing**: Jest, Cypress
 - **DevOps**: Docker, GitHub Actions
 
-## 🎯 Hacktoberfest 2025
+## 🎯 Hacktoberfest 2025 - COMPLETED ✅
 
-This repository is participating in [Hacktoberfest 2025](https://hacktoberfest.com/). We welcome contributions from developers of all experience levels!
+This repository **successfully participated** in [Hacktoberfest 2025](https://hacktoberfest.com/) and is now closed for new contributions.
 
-### 🏆 How to Participate
+### ⚠️ Important Information
 
-1. **Register** for Hacktoberfest 2025 at [hacktoberfest.com](https://hacktoberfest.com/)
-2. **Find an issue** labeled with `hacktoberfest`, `good first issue`, or `help wanted`
-3. **Fork** this repository
-4. **Create** a pull request with your changes
-5. **Get your PR merged** and earn your Hacktoberfest swag! 🎁
+🚫 **This repository is NO LONGER accepting:**
+- New pull requests
+- Issue assignments
+- Fork requests for Hacktoberfest contributions
 
-### 🎖️ Holopin Integration
+✅ **What happened:**
+- 60+ contributors successfully had their PRs verified and merged
+- Amazing contributions from developers worldwide
+- Hacktoberfest goals achieved!
 
-We're integrated with [Holopin](https://holopin.io/) for digital badges! Contributors will automatically receive:
-- 🥇 **First Contribution Badge** - For your first merged PR
+🔍 **Looking to contribute?**
+Please explore other active Hacktoberfest repositories:
+- Visit: [github.com/topics/hacktoberfest](https://github.com/topics/hacktoberfest)
+- Find repositories with the `hacktoberfest` topic actively accepting contributions
+
+---
+
+## 🏆 Archived Participation Information
+
+### 🎖️ Holopin Integration (Completed)
+
+During Hacktoberfest 2025, contributors received [Holopin](https://holopin.io/) digital badges:
+- 🥇 **First Contribution Badge** - For first merged PRs
 - 🌟 **Quality Contributor Badge** - For exceptional contributions
 - 🚀 **Project Supporter Badge** - For ongoing support
+
+---
 
 ## 🚀 Quick Start
 
@@ -87,25 +159,29 @@ Hacktoberfest-2025/
 └── docker/            # Docker configuration
 ```
 
-## 🤝 Contributing
+## 🤝 Contributing (CLOSED)
 
-We love contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+⚠️ **This repository is currently CLOSED for new contributions.**
 
-### Types of Contributions We're Looking For:
+We are no longer accepting:
+- New pull requests
+- Issue assignments
+- Feature requests
 
-- 🐛 **Bug Fixes** - Fix issues and improve stability
-- ✨ **New Features** - Add exciting new functionality
-- 📝 **Documentation** - Improve our docs and examples
-- 🎨 **UI/UX Improvements** - Make it look and feel better
-- 🧪 **Tests** - Help us improve test coverage
-- 🔧 **DevOps** - Improve our build and deployment process
+### 🎉 Success Story
 
-### Good First Issues
+We successfully completed Hacktoberfest 2025 with 60+ amazing contributors! Thank you to everyone who participated.
 
-New to open source? Look for issues labeled:
-- `good first issue` - Perfect for beginners
-- `documentation` - Help improve our docs
-- `help wanted` - We need your expertise!
+### 🔍 Want to Contribute to Open Source?
+
+Please explore other active repositories:
+- [Hacktoberfest Topics](https://github.com/topics/hacktoberfest)
+- [Good First Issues](https://github.com/topics/good-first-issue)
+- [Help Wanted](https://github.com/topics/help-wanted)
+
+---
+
+## 📋 Archived Information
 
 ## 📋 Available Scripts
 
@@ -183,21 +259,33 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⭐ Show Your Support
 
-If you found this project helpful, please consider:
+If you found this project helpful or educational, please consider:
 - ⭐ **Starring** this repository
-- 🍴 **Forking** it for your own contributions
 - 📢 **Sharing** it with your network
-- 💝 **Contributing** to make it even better!
+- 💝 **Learning** from the code and contributions
+
+**Note:** Please do not fork this repository for Hacktoberfest contributions as we are no longer accepting new submissions.
 
 ---
 
 <div align="center">
-  
-**Happy Hacking! 🎃**
+
+### 🙏 Special Thanks
+
+**To all 60+ contributors who made Hacktoberfest 2025 a success!**
+
+Your contributions, dedication, and enthusiasm made this project amazing.
+
+---
+
+**Happy Coding! 🎃**
 
 Made with ❤️ for Hacktoberfest 2025
 
-[⬆️ Back to Top](#-hacktoberfest-2025---modern-web-development-project)
+**Repository Status:** 🔴 Closed for New Contributions
 
+---
+
+[⬆️ Back to Top](#️--important-notice--)
 
 </div>
